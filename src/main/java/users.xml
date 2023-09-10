@@ -1,0 +1,17 @@
+<users>
+    <user>
+        <email>kauan.oliveira@sptech.school</email>
+        <username>kauan</username>
+        <password>kauan123</password>
+    </user>
+    <user>
+        <email>melissa.cavalcante@sptech.school</email>
+        <username>melissa</username>
+        <password>melissa123</password>
+    </user>
+    <user>
+        <email>gustavo.lindo@sptech.school</email>
+        <username>gustavo</username>
+        <password>gustavo123</password>
+    </user>
+</users>

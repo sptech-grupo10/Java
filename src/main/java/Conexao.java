@@ -20,7 +20,7 @@ public class Conexao {
 
         /*-Caso precise fazer alteração nessa parte Não apagem apenas comentem-*/
 
-        dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/biblioteca");
+        dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/ByteGuard");
         dataSource.setUsername("aluno");
         dataSource.setPassword("aluno");
 

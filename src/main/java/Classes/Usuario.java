@@ -6,6 +6,7 @@ public class Usuario {
     private String sobrenome;
     private String situacao;
     private String email;
+    private  String senha;
     private Integer fkLanHouse;
     private Integer fkEmpresa;
     private Integer fkTipoUsuario;
@@ -53,6 +54,12 @@ public class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 
 
@@ -91,6 +98,7 @@ public class Usuario {
                 ", sobrenome=" + sobrenome +
                 ", situação=" + situacao +
                 ", email=" + email +
+                ", senha="+"Salva"+
                 ", fk LanHouse=" + fkLanHouse +
                 ", fk empresa =" + fkEmpresa +
                 ", fk tipo de usuario=" + fkTipoUsuario +

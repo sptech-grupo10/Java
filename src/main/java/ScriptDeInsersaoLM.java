@@ -26,30 +26,77 @@ public class ScriptDeInsersaoLM {
 
     static JdbcTemplate con = conexao.getConexaoDoBanco();
 
+    static AcessoGeralJDBC acesso = new AcessoGeralJDBC();
 
-    public static <Memeoria> void main(String[] args) {
 
-//----------------------------------MAQUINA--------------------------------------------------------//
+    public Integer incercaoMaquina(Integer lanhouse) {
+
+//-----------------------------------------MAQUINA--------------------------------------------------------//
         String nomeDaMaquina = looca.getRede().getParametros().getHostName();
-//----------------------------------------COMPONENTES---------------------------------------------------------//
+        Integer IdMaquina = acesso.inserirMaquina(nomeDaMaquina, lanhouse);
+
+        return IdMaquina;
+    }
+
+    public void incercaoComponentes(Integer maquina) {
+//----------------------------------------COMPONENTES-------------------------------------------------------//
         String processadorAlocado = looca.getProcessador().getNome();
+        Integer idProcessador = acesso.inserirNomeDoComponente(processadorAlocado);
+        acesso.compilarComponente(maquina, 2, 2, idProcessador);
+
         // Memoria memoriaAlocada = looca.getMemoria();
-        String discoAlocado = looca.getGrupoDeDiscos().getDiscos().get(1).getNome();
-        Long capacidadeDisco = looca.getGrupoDeDiscos().getDiscos().get(1).getTamanho();
-        String tipoDisco = looca.getGrupoDeDiscos().getDiscos().get(1).getModelo();
+        Integer idRan = acesso.inserirNomeDoComponente("memRan");
+        acesso.compilarComponente(maquina, 1, 1, idRan);
+
+        String discoAlocado = looca.getGrupoDeDiscos().getDiscos().get(1).getModelo();
+        Integer idDisco = acesso.inserirNomeDoComponente(discoAlocado);
+        acesso.compilarComponente(maquina, 3, 3, idDisco);
+
+
         // redeDownload
         // redeUpload
         // PLACA DE VIDEO = INOVAÇÃO!!!
+    }
 
-//----------------------------------------DADOS DOS COMPONENTES----------------------------------------------//
+
+    //----------------------------------------DADOS DOS COMPONENTES----------------------------------------------//
+    public void incercaoDadosComponentes(Integer maquina) {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
         Object dataHora = LocalDateTime.now();
+        String texto;
+
         Double utilizacaoProcessador = looca.getProcessador().getUso();
-        Integer processos = looca.getGrupoDeProcessos().getTotalProcessos();
+        Integer compProcessador = acesso.selecionarComponente(maquina, 2);
+        if (utilizacaoProcessador>80){
+             texto = "Processamento estourando";
+        } else { texto = "Normal";}
+
+        acesso.capturaDeDados(texto, utilizacaoProcessador, dataHora, compProcessador);
+
+
+
+     /*   Integer processos = looca.getGrupoDeProcessos().getTotalProcessos();
         Integer threadsProcessador = looca.getGrupoDeProcessos().getTotalThreads();
         Integer ThreadsProcessadorByte = (int) looca.getGrupoDeProcessos().getTotalThreads().byteValue();
-        Long memoriaOcupada = looca.getMemoria().getEmUso();
+*/
 
-        String texto = looca.getGrupoDeDiscos().getVolumes().toString();
+
+        Double memoriaOcupada = Double.valueOf(looca.getMemoria().getEmUso());
+        Integer compMemoria = acesso.selecionarComponente(maquina, 1);
+        if (utilizacaoProcessador>90){
+            texto = "Memoria estourando";
+        } else { texto = "Normal";}
+
+        acesso.capturaDeDados(texto, memoriaOcupada, dataHora, compMemoria);
+
+
+
+        Long capacidadeDisco = looca.getGrupoDeDiscos().getDiscos().get(1).getTamanho();
+        String x = looca.getGrupoDeDiscos().getVolumes().toString();
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("disponível: (\\d+)");
         java.util.regex.Matcher matcher = pattern.matcher(texto);
         long valorDisponivelLong = 0;
@@ -66,7 +113,21 @@ public class ScriptDeInsersaoLM {
             valorTotalLong = Long.parseLong(valorTotal);
         }
 
-        long discoOcupado = valorTotalLong - valorDisponivelLong;
+        Double discoOcupado = (double) (valorTotalLong - valorDisponivelLong);
+
+        Integer compDisco = acesso.selecionarComponente(maquina, 3);
+        if (utilizacaoProcessador>90){
+            texto = "Armazenamento estourando";
+        } else { texto = "Normal";}
+
+        acesso.capturaDeDados(texto, discoOcupado, dataHora, compDisco);
+
+
+
+
+
+
+
         // velocidadeRedeDownload
         // velocidadeRedeUpload
         //quadrosPlaca = INOVAÇÃO!!!
@@ -76,7 +137,13 @@ public class ScriptDeInsersaoLM {
 
 
 
+
+            }
+
+        }, 1000, 1000);
+
     }
+
 }
 
 

@@ -10,7 +10,6 @@ public class JarLM {
 
 
     public static void main(String[] args) {
-
         System.out.println("Nome da Empresa");
         String nomeEmpresa = usuarioString.nextLine();
         System.out.println("Nome da LanHouse");

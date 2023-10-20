@@ -12,6 +12,8 @@ import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.temperatura.Temperatura;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -66,93 +68,70 @@ public class ScriptDeInsersaoLM {
             @Override
             public void run() {
 
-        Object dataHora = LocalDateTime.now();
-        String texto;
+                Object dataHora = LocalDateTime.now();
+                String texto;
 
-        Double utilizacaoProcessador = looca.getProcessador().getUso();
-        Integer compProcessador = acesso.selecionarComponente(maquina, 2);
-        if (utilizacaoProcessador>80){
-             texto = "Processamento estourando";
-        } else { texto = "Normal";}
+                Double utilizacaoProcessador = looca.getProcessador().getUso();
+                Integer compProcessador = acesso.selecionarComponente(maquina, 2);
+                if (utilizacaoProcessador > 20) {
+                    texto = "Processamento estourando";
+                } else {
+                    texto = "Normal";
+                }
 
-        acesso.capturaDeDados(texto, utilizacaoProcessador, dataHora, compProcessador);
-
-
-
-     /*   Integer processos = looca.getGrupoDeProcessos().getTotalProcessos();
-        Integer threadsProcessador = looca.getGrupoDeProcessos().getTotalThreads();
-        Integer ThreadsProcessadorByte = (int) looca.getGrupoDeProcessos().getTotalThreads().byteValue();
-*/
+                acesso.capturaDeDados(texto, utilizacaoProcessador, dataHora, compProcessador);
 
 
-        Double memoriaOcupada = Double.valueOf(looca.getMemoria().getEmUso());
-        Integer compMemoria = acesso.selecionarComponente(maquina, 1);
-        if (utilizacaoProcessador>90){
-            texto = "Memoria estourando";
-        } else { texto = "Normal";}
+                Double memoriaOcupada = Double.valueOf(looca.getMemoria().getEmUso());
+                Double memoriaTotal = Double.valueOf(looca.getMemoria().getTotal());
+                Double memoriaOcupadaPorcentagem = ((memoriaOcupada * 100) / memoriaTotal);
+                Integer compMemoria = acesso.selecionarComponente(maquina, 1);
+                if (utilizacaoProcessador > 90) {
+                    texto = "Memoria estourando";
+                } else {
+                    texto = "Normal";
+                }
 
-        acesso.capturaDeDados(texto, memoriaOcupada, dataHora, compMemoria);
-
-
-
-        Long capacidadeDisco = looca.getGrupoDeDiscos().getDiscos().get(1).getTamanho();
-        String x = looca.getGrupoDeDiscos().getVolumes().toString();
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("disponível: (\\d+)");
-        java.util.regex.Matcher matcher = pattern.matcher(texto);
-        long valorDisponivelLong = 0;
-        if (matcher.find()) {
-            String valorDisponivel = matcher.group(1);
-            valorDisponivelLong = Long.parseLong(valorDisponivel);
-        }
-        String texto2 = looca.getGrupoDeDiscos().getVolumes().toString();
-        java.util.regex.Pattern pattern2 = java.util.regex.Pattern.compile("total: (\\d+)");
-        java.util.regex.Matcher matcher2 = pattern.matcher(texto2);
-        long valorTotalLong = 0;
-        if (matcher.find()) {
-            String valorTotal = matcher.group(1);
-            valorTotalLong = Long.parseLong(valorTotal);
-        }
-
-        Double discoOcupado = (double) (valorTotalLong - valorDisponivelLong);
-
-        Integer compDisco = acesso.selecionarComponente(maquina, 3);
-        if (utilizacaoProcessador>90){
-            texto = "Armazenamento estourando";
-        } else { texto = "Normal";}
-
-        acesso.capturaDeDados(texto, discoOcupado, dataHora, compDisco);
+                acesso.capturaDeDados(texto, memoriaOcupadaPorcentagem, dataHora, compMemoria);
 
 
+                Double valorDisponivel = Double.valueOf(looca.getGrupoDeDiscos().getVolumes().get(0).getDisponivel() / 8e+9);
+                Double valorTotal = Double.valueOf(looca.getGrupoDeDiscos().getVolumes().get(0).getTotal() / 8e+9);
+
+                BigDecimal valorDisponivelBigDecimal = new BigDecimal(valorDisponivel);
+                valorDisponivelBigDecimal = valorDisponivelBigDecimal.setScale(2, RoundingMode.HALF_UP);
+                Double valorDisponivelArredondado = valorDisponivelBigDecimal.doubleValue();
+                System.out.println(valorDisponivelArredondado);
+
+                BigDecimal valorTotalBigDecimal = new BigDecimal(valorTotal);
+                valorTotalBigDecimal = valorTotalBigDecimal.setScale(2, RoundingMode.HALF_UP);
+                Double valorTotalArredondado = valorTotalBigDecimal.doubleValue();
+                System.out.println(valorTotalArredondado);
+
+                Double discoOcupado = (valorTotalArredondado - valorDisponivelArredondado);
+                Double porcentagemOcupado = ((discoOcupado * 100) / valorTotalArredondado);
+
+                Integer compDisco = acesso.selecionarComponente(maquina, 3);
+                if (utilizacaoProcessador > 90) {
+                    texto = "Armazenamento estourando";
+                } else {
+                    texto = "Normal";
+                }
+
+                acesso.capturaDeDados(texto, porcentagemOcupado, dataHora, compDisco);
 
 
-
-
-
-        // velocidadeRedeDownload
-        // velocidadeRedeUpload
-        //quadrosPlaca = INOVAÇÃO!!!
-        //temperaturaPlaca = INOVAÇÃO!!!
-        //entergiaConsumidaPlaca = INOVAÇÃO!!!
-
-
-
+                // velocidadeRedeDownload
+                // velocidadeRedeUpload
+                //quadrosPlaca = INOVAÇÃO!!!
+                //temperaturaPlaca = INOVAÇÃO!!!
+                //entergiaConsumidaPlaca = INOVAÇÃO!!!
 
 
             }
 
-        }, 1000, 1000);
+        }, 0, 1000);
 
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-

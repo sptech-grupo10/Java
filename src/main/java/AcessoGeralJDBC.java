@@ -36,9 +36,19 @@ public class AcessoGeralJDBC {
             );
         }
         return idLanHouse;
-    }
+    };
 
-    ;
+    public Integer DescobrirIdLanHousePorCodigo(String codigoAcesso) {
+        List<Integer> idLanHouses = con.queryForList("SELECT idLanHouse FROM LanHouse WHERE codigoAcesso = ?", Integer.class, codigoAcesso);
+        Integer idLanHouse = idLanHouses.get(0);
+
+        if (idLanHouse == null) {
+            System.out.println(
+                    "LanHouse não existe"
+            );
+        }
+        return idLanHouse;
+    };
 
     public Integer DescobrirIdUsiario(String nome, String senha) {
         List<Integer> idUsuarios = con.queryForList("SELECT idUsuario FROM Usuario WHERE nome = ? AND senha = ?", Integer.class, nome, senha);
@@ -65,7 +75,7 @@ public class AcessoGeralJDBC {
             idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanHouse = ?", Integer.class, nome, fkLanHouse);
             idMaquina = idMaquinas.get(0);
 
-        } catch (ArrayIndexOutOfBoundsException err){
+        } catch (ArrayIndexOutOfBoundsException err) {
             System.out.println("Deu erro na maquina");
             err.printStackTrace();
         } finally {
@@ -84,13 +94,13 @@ public class AcessoGeralJDBC {
     /*--------------------------------------------------------------Especificação de componentes--------------------------------------------------------------*/
     public Integer inserirNomeDoComponente(String nome) {
         List<Integer> idEspecificacoesComponentes = new ArrayList<>();
-        Integer idEspecificacoesComponente= null;
+        Integer idEspecificacoesComponente = null;
         try {
-        idEspecificacoesComponentes = con.queryForList("SELECT idEspecificacoesComponente FROM EspecificacoesComponente WHERE especificacao = ?", Integer.class, nome);
-        idEspecificacoesComponente = idEspecificacoesComponentes.get(0);
-        }catch (IndexOutOfBoundsException err){
+            idEspecificacoesComponentes = con.queryForList("SELECT idEspecificacoesComponente FROM EspecificacoesComponente WHERE especificacao = ?", Integer.class, nome);
+            idEspecificacoesComponente = idEspecificacoesComponentes.get(0);
+        } catch (IndexOutOfBoundsException err) {
             System.out.println("erro em espeficação de componente");
-            }finally {
+        } finally {
             if (idEspecificacoesComponente == null) {
                 con.update("INSERT INTO EspecificacoesComponente VALUES (null,?,null)", nome);
                 inserirNomeDoComponente(nome);
@@ -109,9 +119,10 @@ public class AcessoGeralJDBC {
         List<Integer> Componentes = new ArrayList<>();
         Integer Componente = null;
         try {
-        Componentes = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente =? AND fkMetricaComponente = ? AND fkEspecificacoesComponente =?", Integer.class, maquina, tipo, metrica, especificacao);
-        Componente = Componentes.get(0);
-        }catch (IndexOutOfBoundsException err){
+            Componentes = con.queryForList("" +
+                    "SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente =? AND fkMetricaComponente = ? AND fkEspecificacoesComponente =?", Integer.class, maquina, tipo, metrica, especificacao);
+            Componente = Componentes.get(0);
+        } catch (IndexOutOfBoundsException err) {
             System.out.println("erro na concatenação de componente");
         } finally {
             if (Componente == null) {
@@ -121,16 +132,20 @@ public class AcessoGeralJDBC {
                 System.out.println("Maquina e componentes verificados e autenticados");
             }
         }
-    };
+    }
 
-    Integer selecionarComponente(Integer maquina,Integer tipo){
-        List<Integer> Componentes = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? ", Integer.class, maquina, tipo );
+    ;
+
+    Integer selecionarComponente(Integer maquina, Integer tipo) {
+        List<Integer> Componentes = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? ", Integer.class, maquina, tipo);
         Integer Componente = Componentes.get(0);
         return Componente;
     }
 
-    public void capturaDeDados(String texto, Double valor, Object timer, Integer componente){
-        con.update("INSERT INTO Log VALUES (null,?,?,?,null,?)", texto, valor, timer,componente);
-    };
+    public void capturaDeDados(String texto, Double valor, Object timer, Integer componente) {
+        con.update("INSERT INTO Log VALUES (null,?,?,?,null,?)", texto, valor, timer, componente);
+    }
+
+    ;
 
 };

@@ -80,6 +80,7 @@ public class ScriptDeInsersaoLM {
                 }
 
                 acesso.capturaDeDados(texto, utilizacaoProcessador, dataHora, compProcessador);
+                System.out.printf("\n\nUtilizacao de processador: %.2f",  utilizacaoProcessador);
 
 
                 Double memoriaOcupada = Double.valueOf(looca.getMemoria().getEmUso());
@@ -93,6 +94,7 @@ public class ScriptDeInsersaoLM {
                 }
 
                 acesso.capturaDeDados(texto, memoriaOcupadaPorcentagem, dataHora, compMemoria);
+                System.out.printf("\n\nMemória ocupada: %.2f%%",  memoriaOcupadaPorcentagem);
 
 
                 Double valorDisponivel = Double.valueOf(looca.getGrupoDeDiscos().getVolumes().get(0).getDisponivel() / 8e+9);
@@ -101,12 +103,12 @@ public class ScriptDeInsersaoLM {
                 BigDecimal valorDisponivelBigDecimal = new BigDecimal(valorDisponivel);
                 valorDisponivelBigDecimal = valorDisponivelBigDecimal.setScale(2, RoundingMode.HALF_UP);
                 Double valorDisponivelArredondado = valorDisponivelBigDecimal.doubleValue();
-                System.out.println(valorDisponivelArredondado);
+                System.out.printf("\n\nValor de disco disponível: %.2f%%",  valorDisponivelArredondado);
 
                 BigDecimal valorTotalBigDecimal = new BigDecimal(valorTotal);
                 valorTotalBigDecimal = valorTotalBigDecimal.setScale(2, RoundingMode.HALF_UP);
                 Double valorTotalArredondado = valorTotalBigDecimal.doubleValue();
-                System.out.println(valorTotalArredondado);
+                System.out.printf("\n\nValor total do disco: %.2f%%",  valorTotalArredondado);
 
                 Double discoOcupado = (valorTotalArredondado - valorDisponivelArredondado);
                 Double porcentagemOcupado = ((discoOcupado * 100) / valorTotalArredondado);

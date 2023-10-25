@@ -5,7 +5,6 @@ public class LanHouse {
     private Integer cnpj;
     private String unidade;
     private String email;
-    private String codigoAcesso;
     private Integer fkEndereco;
     private Integer fkRepresentante;
     private Integer fkEmpresa;
@@ -31,14 +30,6 @@ public class LanHouse {
 
     public String getUnidade() {
         return unidade;
-    }
-
-    public String getCodigoAcesso() {
-        return codigoAcesso;
-    }
-
-    public void setCodigoAcesso(String codigoAcesso) {
-        this.codigoAcesso = codigoAcesso;
     }
 
     public void setUnidade(String unidade) {
@@ -87,7 +78,6 @@ public class LanHouse {
                 "id LanHouse=" + idLanHouse +
                 ", cnpj=" + cnpj +
                 ", unidade=" + unidade +
-                ", codigoAcesso=" + codigoAcesso +
                 ", email=" + email +
                 ", fk endereço =" + fkEndereco +
                 ", fk representante =" +  fkRepresentante +

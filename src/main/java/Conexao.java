@@ -6,16 +6,29 @@ public class Conexao {
 
     public Conexao() {
         BasicDataSource dataSource = new BasicDataSource();
-
+        /*
+             Exemplo de driverClassName:
+                 <- EXEMPLO PARA MYSQL
+                com.microsoft.sqlserver.jdbc.SQLServerDriver <- EXEMPLO PARA SQL SERVER
+        */
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/ByteGuard");
+        /*
+             Exemplo de string de conexões:
+                jdbc:mysql://localhost:3306/mydb <- EXEMPLO PARA MYSQL
+                jdbc:sqlserver://localhost:1433;database=mydb <- EXEMPLO PARA SQL SERVER
+        */
+
+        /*-Caso precise fazer alteração nessa parte Não apagem apenas comentem-*/
+
+        dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/ByteGuard");
         dataSource.setUsername("aluno");
         dataSource.setPassword("aluno");
 
-        conexaoDoBanco = new JdbcTemplate(dataSource);
-    }
 
-    public JdbcTemplate getConexaoDoBanco() {
-        return conexaoDoBanco;
+
+        conexaoDoBanco = new JdbcTemplate(dataSource);
+
     }
+    public JdbcTemplate getConexaoDoBanco(){return conexaoDoBanco;};
+
 }

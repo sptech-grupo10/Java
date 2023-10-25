@@ -3,6 +3,7 @@ package Classes;
 public class Maquina {
     Integer idMaquina;
     String nomeMaquina;
+    Integer fkSala;
     Integer fkLanHouse;
 
 
@@ -22,6 +23,14 @@ public class Maquina {
         this.nomeMaquina = nomeMaquina;
     }
 
+    public Integer getFkSala() {
+        return fkSala;
+    }
+
+    public void setFkSala(Integer fkSala) {
+        this.fkSala = fkSala;
+    }
+
     public Integer getFkLanHouse() {
         return fkLanHouse;
     }
@@ -37,6 +46,7 @@ public class Maquina {
         return "\nMaquina{" +
                 "id maquina=" + idMaquina +
                 ", nome de maquina=" + nomeMaquina +
+                ", sala=" + fkSala +
                 ", Lan House=" + fkLanHouse +
                 '}';
     }

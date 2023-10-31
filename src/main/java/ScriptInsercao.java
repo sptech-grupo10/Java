@@ -32,9 +32,9 @@ public class ScriptInsercao {
 
     public List<Integer> cadastrarComponentes(Integer idMaquina) {
         List<Integer> idsComponentes = new ArrayList<>();
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, acesso.buscarIdTipoComponente("Processador"), acesso.buscarOuCadastrarMetricaComponente(0.0, 90.0, "%"), acesso.cadastrarEspecComponente(looca.getProcessador().getNome())));
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, acesso.buscarIdTipoComponente("Ram"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%"), acesso.cadastrarEspecComponente("Memória RAM")));
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, acesso.buscarIdTipoComponente("Disco"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%"), acesso.cadastrarEspecComponente(looca.getGrupoDeDiscos().getDiscos().get(1).getModelo())));
+        idsComponentes.add(acesso.cadastrarComponente(looca.getProcessador().getFrequencia()/1e+9 ,idMaquina, acesso.buscarIdTipoComponente("Processador"), acesso.buscarOuCadastrarMetricaComponente(0.0, 90.0, "%"), acesso.cadastrarEspecComponente(looca.getProcessador().getNome())));
+        idsComponentes.add(acesso.cadastrarComponente(Double.valueOf(looca.getMemoria().getTotal()/1e+9),idMaquina, acesso.buscarIdTipoComponente("Ram"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%"), acesso.cadastrarEspecComponente("Memória RAM")));
+        idsComponentes.add(acesso.cadastrarComponente(Double.valueOf(looca.getGrupoDeDiscos().getDiscos().get(1).getTamanho()/8e+9),idMaquina, acesso.buscarIdTipoComponente("Disco"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%"), acesso.cadastrarEspecComponente(looca.getGrupoDeDiscos().getDiscos().get(1).getModelo())));
         return idsComponentes;
     }
 

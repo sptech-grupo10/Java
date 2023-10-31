@@ -48,7 +48,7 @@ public class AcessoJDBC {
         especComponenteSel = con.queryForList("SELECT idEspecificacoesComponente FROM EspecificacoesComponente WHERE especificacao = ?", Integer.class, especificacao);
 
         if (especComponenteSel.isEmpty()) {
-            con.update("INSERT INTO EspecificacoesComponente VALUES (null, ?, null)", especificacao);
+            con.update("INSERT INTO EspecificacoesComponente VALUES (null, ?)", especificacao);
             especComponenteSel = con.queryForList("SELECT idEspecificacoesComponente FROM EspecificacoesComponente WHERE especificacao = ?", Integer.class, especificacao);
         }
         System.out.println("Componente " + especificacao + " localizado");
@@ -75,13 +75,13 @@ public class AcessoJDBC {
         return metricaComponente;
     }
 
-    public Integer cadastrarComponente(Integer idMaquina, Integer idTipoComponente, Integer idMetrica, Integer idEspecificacao) {
+    public Integer cadastrarComponente(Double valorTotal, Integer idMaquina, Integer idTipoComponente, Integer idMetrica, Integer idEspecificacao) {
         List<Integer> componenteSel = new ArrayList<>();
 
         componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ? AND fkEspecificacoesComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica, idEspecificacao);
 
         if (componenteSel.isEmpty()) {
-            con.update("INSERT INTO Componente VALUES(null, ?, ?, ?, ?)", idMaquina, idTipoComponente, idMetrica, idEspecificacao);
+            con.update("INSERT INTO Componente VALUES(null,?, ?, ?, ?, ?)",valorTotal, idMaquina, idTipoComponente, idMetrica, idEspecificacao);
             componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ? AND fkEspecificacoesComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica, idEspecificacao);
         }
 

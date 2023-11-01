@@ -7,6 +7,7 @@ import com.github.britooo.looca.api.group.memoria.Memoria;
 import com.github.britooo.looca.api.group.processador.Processador;
 import com.github.britooo.looca.api.group.processos.ProcessoGrupo;
 import com.github.britooo.looca.api.group.rede.Rede;
+import com.github.britooo.looca.api.group.rede.RedeInterface;
 import com.github.britooo.looca.api.group.servicos.ServicoGrupo;
 import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.temperatura.Temperatura;
@@ -32,9 +33,31 @@ public class ScriptInsercao {
 
     public List<Integer> cadastrarComponentes(Integer idMaquina) {
         List<Integer> idsComponentes = new ArrayList<>();
-        idsComponentes.add(acesso.cadastrarComponente(looca.getProcessador().getFrequencia()/1e+9 ,idMaquina, acesso.buscarIdTipoComponente("Processador"), acesso.buscarOuCadastrarMetricaComponente(0.0, 90.0, "%"), acesso.cadastrarEspecComponente(looca.getProcessador().getNome())));
-        idsComponentes.add(acesso.cadastrarComponente(Double.valueOf(looca.getMemoria().getTotal()/1e+9),idMaquina, acesso.buscarIdTipoComponente("Ram"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%"), acesso.cadastrarEspecComponente("Memória RAM")));
-        idsComponentes.add(acesso.cadastrarComponente(Double.valueOf(looca.getGrupoDeDiscos().getDiscos().get(1).getTamanho()/8e+9),idMaquina, acesso.buscarIdTipoComponente("Disco"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%"), acesso.cadastrarEspecComponente(looca.getGrupoDeDiscos().getDiscos().get(1).getModelo())));
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Processador"), acesso.buscarOuCadastrarMetricaComponente(0.0, 90.0, "%")));
+        acesso.cadastrarEspecsComponente("Numero CPU lógicas", looca.getProcessador().getNumeroCpusLogicas().toString(), idsComponentes.get(0));
+        acesso.cadastrarEspecsComponente("Modelo", looca.getProcessador().getNome(), idsComponentes.get(0));
+        acesso.cadastrarEspecsComponente("Fabricante", looca.getProcessador().getFabricante(), idsComponentes.get(0));
+        acesso.cadastrarEspecsComponente("Identificador", looca.getProcessador().getIdentificador(), idsComponentes.get(0));
+
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Ram"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%")));
+        acesso.cadastrarEspecsComponente("Capacidade máxima (GB)", looca.getMemoria().getTotal().toString(), idsComponentes.get(1));
+
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Disco"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%")));
+        acesso.cadastrarEspecsComponente("Modelo", looca.getGrupoDeDiscos().getDiscos().get(0).getModelo(), idsComponentes.get(2));
+        acesso.cadastrarEspecsComponente("UUID", looca.getGrupoDeDiscos().getVolumes().get(0).getUUID(), idsComponentes.get(2));
+        acesso.cadastrarEspecsComponente("Tipo de disco", looca.getGrupoDeDiscos().getVolumes().get(0).getTipo(), idsComponentes.get(2));
+        acesso.cadastrarEspecsComponente("Unidade", looca.getGrupoDeDiscos().getVolumes().get(0).getPontoDeMontagem(), idsComponentes.get(2));
+
+        for (RedeInterface rede : looca.getRede().getGrupoDeInterfaces().getInterfaces()) {
+            if (!rede.getEnderecoIpv4().isEmpty()) {
+                idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Rede"), acesso.buscarOuCadastrarMetricaComponente(40.0, 90.0, "%")));
+                acesso.cadastrarEspecsComponente("Endereço IPv4", rede.getEnderecoIpv4().get(0), idsComponentes.get(3));
+                acesso.cadastrarEspecsComponente("Endereço IPv6", rede.getEnderecoIpv6().get(0), idsComponentes.get(3));
+                acesso.cadastrarEspecsComponente("Nome da rede", rede.getNome(), idsComponentes.get(3));
+                acesso.cadastrarEspecsComponente("Nome de exibição", rede.getNomeExibicao(), idsComponentes.get(3));
+                break;
+            }
+        }
         return idsComponentes;
     }
 

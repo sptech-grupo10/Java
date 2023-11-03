@@ -60,13 +60,15 @@ public class ScriptInsercao {
         }
         return idsComponentes;
     }
+    
 
-    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco) {
+    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede) {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             List<Double> metricaProcessador = acesso.obterMetricaComponente(idProcessador);
             List<Double> metricaRam = acesso.obterMetricaComponente(idRam);
             List<Double> metricaDisco = acesso.obterMetricaComponente(idDisco);
+            List<Double> metricaRede = acesso.obterMetricaComponente(idRede);
 
             @Override
             public void run() {
@@ -125,6 +127,61 @@ public class ScriptInsercao {
                 }
                 acesso.insercaoDados(textLog, porcentagemDiscoOcupado, dataHora, statusLog, idDisco);
                 System.out.printf("\nUtilização de Disco: %d%%", porcentagemDiscoOcupado.shortValue());
+
+
+                //Rede - Download
+//
+                Double velocidadeDownload = 0.0;
+                List<RedeInterface> lista = looca.getRede().getGrupoDeInterfaces().getInterfaces();
+                for (int i = 0; lista.size() > i; i++){
+                    if (!lista.get(i).getEnderecoIpv4().isEmpty()){
+                        velocidadeDownload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesEnviados() /  1048576.0;
+                        break;
+                    }
+                }
+
+                Double porcentagemVelocidadeDowload = (velocidadeDownload * 100) / 150.0;
+
+                if (porcentagemVelocidadeDowload < metricaRede.get(0)){
+                    textLog = "Download fora do ideal";
+                    statusLog = 2;
+                } else {
+                    textLog = "Download ideal";
+                    statusLog = 1;
+                }
+                acesso.insercaoDados(textLog, velocidadeDownload, dataHora, statusLog, idRede);
+                System.out.println(String.format("""
+                        
+                        Velocidade de Download: %.2f
+                        """, velocidadeDownload));
+
+
+                //Rede - Upload
+
+                Double velocidadeUpload = 0.0;
+
+                for (int i = 0; lista.size() > i; i++){
+                    if (!lista.get(i).getEnderecoIpv4().isEmpty()){
+                        velocidadeUpload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesRecebidos() / 1048576.0;
+                        break;
+                    }
+                }
+
+                lista.size();
+
+                Double porcentagemVelocidadeUpload = (velocidadeUpload * 100) / 50.0;
+
+                if (porcentagemVelocidadeUpload < metricaRede.get(0)){
+                    textLog = "Upload fora do ideal";
+                    statusLog = 2;
+                } else {
+                    textLog = "Upload ideal";
+                    statusLog = 1;
+                }
+                acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idRede);
+                System.out.println(String.format("""
+                        Velocidade de Upload: %.2f
+                        """, velocidadeUpload));
             }
         }, 0, 1000);
     }

@@ -11,7 +11,11 @@ import com.github.britooo.looca.api.group.rede.RedeInterface;
 import com.github.britooo.looca.api.group.servicos.ServicoGrupo;
 import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.temperatura.Temperatura;
+import com.google.errorprone.annotations.Immutable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.apache.commons.dbcp2.BasicDataSource;
+import oshi.SystemInfo;
+import oshi.hardware.HardwareAbstractionLayer;
 
 
 import java.math.BigDecimal;
@@ -19,7 +23,11 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class ScriptInsercao {
+
+
+
+
+public class ScriptInsercao{
     static Looca looca = new Looca();
 
     static Conexao conexao = new Conexao();
@@ -27,6 +35,12 @@ public class ScriptInsercao {
     static JdbcTemplate con = conexao.getConexaoDoBanco();
 
     static AcessoJDBC acesso = new AcessoJDBC();
+
+    SystemInfo systemInfo = new SystemInfo();
+    HardwareAbstractionLayer hardware = systemInfo.getHardware();
+
+
+
 
     public Integer cadastroMaquina(Integer idLanhouse) {
         return acesso.cadastrarMaquina(looca.getRede().getParametros().getHostName(), idLanhouse);
@@ -59,11 +73,19 @@ public class ScriptInsercao {
                 break;
             }
         }
+
+        //cadastrando gpu - inovacao
+
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("GPU"), acesso.buscarOuCadastrarMetricaComponente(0.0, 90.0, "%")));
+        acesso.cadastrarEspecsComponente("Nome da placa Gráfica", hardware.getGraphicsCards().get(0).getName(), idsComponentes.get(4));
+        acesso.cadastrarEspecsComponente("Marca placa gráfica", hardware.getGraphicsCards().get(0).getVendor(), idsComponentes.get(4));
+        acesso.cadastrarEspecsComponente("Versão do driver", hardware.getGraphicsCards().get(0).getVersionInfo(), idsComponentes.get(4));
+
         return idsComponentes;
     }
 
 
-    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede) {
+    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede, Integer idGpu   ) {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             List<Double> metricaProcessador = acesso.obterMetricaComponente(idProcessador);

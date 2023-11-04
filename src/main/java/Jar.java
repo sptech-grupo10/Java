@@ -46,7 +46,7 @@ public class Jar {
 
                 List<Integer> idsComponentes = insercao.cadastrarComponentes(idMaquina);
 
-                insercao.inserirDados(idsComponentes.get(0), idsComponentes.get(1), idsComponentes.get(2), idsComponentes.get(3));
+                insercao.inserirDados(idsComponentes.get(0), idsComponentes.get(1), idsComponentes.get(2), idsComponentes.get(3), idsComponentes.get(4));
                 break;
             case 2:
                 main(null);

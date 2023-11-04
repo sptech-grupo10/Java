@@ -13,6 +13,7 @@ import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.temperatura.Temperatura;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -60,7 +61,7 @@ public class ScriptInsercao {
         }
         return idsComponentes;
     }
-    
+
 
     public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede) {
         Timer timer = new Timer();
@@ -135,7 +136,7 @@ public class ScriptInsercao {
                 List<RedeInterface> lista = looca.getRede().getGrupoDeInterfaces().getInterfaces();
                 for (int i = 0; lista.size() > i; i++){
                     if (!lista.get(i).getEnderecoIpv4().isEmpty()){
-                        velocidadeDownload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesEnviados() /  1048576.0;
+                        velocidadeDownload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesEnviados()/1.0;
                         break;
                     }
                 }
@@ -150,11 +151,7 @@ public class ScriptInsercao {
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeDownload, dataHora, statusLog, idRede);
-                System.out.println(String.format("""
-                        
-                        Velocidade de Download: %.2f
-                        """, velocidadeDownload));
-
+                System.out.println("\nVelocidade de download:" + velocidadeDownload);
 
                 //Rede - Upload
 
@@ -162,14 +159,14 @@ public class ScriptInsercao {
 
                 for (int i = 0; lista.size() > i; i++){
                     if (!lista.get(i).getEnderecoIpv4().isEmpty()){
-                        velocidadeUpload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesRecebidos() / 1048576.0;
+                        velocidadeUpload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesRecebidos() / 1.0;
                         break;
                     }
                 }
 
-                lista.size();
+                System.out.println(lista.size());
 
-                Double porcentagemVelocidadeUpload = (velocidadeUpload * 100) / 50.0;
+                Double porcentagemVelocidadeUpload = (velocidadeUpload * 100) / 1.0;
 
                 if (porcentagemVelocidadeUpload < metricaRede.get(0)){
                     textLog = "Upload fora do ideal";
@@ -179,9 +176,7 @@ public class ScriptInsercao {
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idRede);
-                System.out.println(String.format("""
-                        Velocidade de Upload: %.2f
-                        """, velocidadeUpload));
+                System.out.println("Velocidade de upload:" + velocidadeUpload);
             }
         }, 0, 1000);
     }

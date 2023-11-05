@@ -49,6 +49,8 @@ public class Jar {
                 insercao.inserirDados(idsComponentes.get(0), idsComponentes.get(1), idsComponentes.get(2), idsComponentes.get(3), idsComponentes.get(4));
                 break;
             case 2:
+//                AcessoJDBC.enviarAlerta("teste");
+//                System.out.println("passou pelo metodo");
                 main(null);
                 break;
             case 3:

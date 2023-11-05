@@ -93,6 +93,7 @@ public class ScriptInsercao{
             List<Double> metricaDisco = acesso.obterMetricaComponente(idDisco);
             List<Double> metricaRede = acesso.obterMetricaComponente(idRede);
 
+
             @Override
             public void run() {
                 Object dataHora = LocalDateTime.now();
@@ -104,6 +105,7 @@ public class ScriptInsercao{
                 if (utilizacaoProcessador < metricaProcessador.get(0) || utilizacaoProcessador > metricaProcessador.get(1)) {
                     textLog = "Processador sobrecarregado";
                     statusLog = 2;
+                    acesso.enviarAlerta("Atenção: Processador sobrecarregado...");
                 } else {
                     textLog = "Processador em uso normal";
                     statusLog = 1;
@@ -119,6 +121,7 @@ public class ScriptInsercao{
                 if (porcMemoria < metricaRam.get(0) || porcMemoria > metricaRam.get(1)) {
                     textLog = "Memória RAM sobrecarregado";
                     statusLog = 2;
+                    acesso.enviarAlerta("Atenção: Memória Ram sobrecarregada...");
                 } else {
                     textLog = "Memória RAM em uso normal";
                     statusLog = 1;
@@ -144,6 +147,7 @@ public class ScriptInsercao{
                 if (porcentagemDiscoOcupado < metricaDisco.get(0) || porcentagemDiscoOcupado > metricaDisco.get(1)) {
                     textLog = "Disco sobrecarregado";
                     statusLog = 2;
+                    acesso.enviarAlerta("Atenção: Disco sobrecarregado...");
                 } else {
                     textLog = "Disco em uso normal";
                     statusLog = 1;
@@ -168,6 +172,7 @@ public class ScriptInsercao{
                 if (porcentagemVelocidadeDowload < metricaRede.get(0)){
                     textLog = "Download fora do ideal";
                     statusLog = 2;
+                    AcessoJDBC.enviarAlerta("Atenção: Velocidade de Download fora do ideal...");
                 } else {
                     textLog = "Download ideal";
                     statusLog = 1;
@@ -193,6 +198,7 @@ public class ScriptInsercao{
                 if (porcentagemVelocidadeUpload < metricaRede.get(0)){
                     textLog = "Upload fora do ideal";
                     statusLog = 2;
+                    acesso.enviarAlerta("Atenção: Velocidade de Upload fora do ideal...");
                 } else {
                     textLog = "Upload ideal";
                     statusLog = 1;

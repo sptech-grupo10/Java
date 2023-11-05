@@ -1,3 +1,6 @@
+import com.github.seratch.jslack.Slack;
+import com.github.seratch.jslack.api.webhook.Payload;
+import com.github.seratch.jslack.api.webhook.WebhookResponse;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
@@ -7,6 +10,10 @@ import java.util.Map;
 public class AcessoJDBC {
     Conexao conexao = new Conexao();
     JdbcTemplate con = conexao.getConexaoDoBanco();
+    private static String webHooksUrl = "https://hooks.slack.com/services/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";
+    private static String oAuthToken = "xoxb-6146401163538-6147415712946-6fi0np5JSHztzuFkq5ZI8AFf";
+    private static String canalSlack = "alertas";
+
 
     public Integer obterIdLanhousePorCodigo(String codigoAcesso) {
         List<Integer> idLanhouse = con.queryForList("SELECT idLanhouse FROM Lanhouse WHERE codigoAcesso = ?", Integer.class, codigoAcesso);
@@ -99,5 +106,20 @@ public class AcessoJDBC {
 
     public void insercaoDados(String textLog, Double valor, Object timer, Integer statusLog, Integer idComponente) {
         con.update("INSERT INTO Log VALUES (null, ?, ?, ?, ?, ?)", textLog, valor.shortValue(), timer, statusLog, idComponente);
+    }
+
+    public static void enviarAlerta(String mensagem){
+
+        try{
+
+            StringBuilder msgBuilder = new StringBuilder();
+            msgBuilder.append(mensagem);
+
+            Payload payload = Payload.builder().channel(canalSlack).text(msgBuilder.toString()).build();
+            WebhookResponse wbResp = Slack.getInstance().send(webHooksUrl, payload);
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

@@ -105,20 +105,21 @@ public class AcessoJDBC {
     }
 
     public void insercaoDados(String textLog, Double valor, Object timer, Integer statusLog, Integer idComponente) {
-        con.update("INSERT INTO Log VALUES (null, ?, ?, ?, ?, ?)", textLog, valor.shortValue(), timer, statusLog, idComponente);
+        if (textLog.contains("Download") || textLog.contains("Upload")) {
+            con.update("INSERT INTO Log VALUES (null, ?, ?, ?, ?, ?)", textLog, valor.longValue(), timer, statusLog, idComponente);
+        } else {
+            con.update("INSERT INTO Log VALUES (null, ?, ?, ?, ?, ?)", textLog, valor.shortValue(), timer, statusLog, idComponente);
+        }
     }
 
-    public static void enviarAlerta(String mensagem){
-
-        try{
-
+    public static void enviarAlerta(String mensagem) {
+        try {
             StringBuilder msgBuilder = new StringBuilder();
             msgBuilder.append(mensagem);
 
             Payload payload = Payload.builder().channel(canalSlack).text(msgBuilder.toString()).build();
             WebhookResponse wbResp = Slack.getInstance().send(webHooksUrl, payload);
-
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

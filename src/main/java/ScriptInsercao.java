@@ -11,6 +11,7 @@ import com.github.britooo.looca.api.group.rede.RedeInterface;
 import com.github.britooo.looca.api.group.servicos.ServicoGrupo;
 import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.temperatura.Temperatura;
+import com.github.britooo.looca.api.util.Conversor;
 import com.google.errorprone.annotations.Immutable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -24,10 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 
-
-
-
-public class ScriptInsercao{
+public class ScriptInsercao {
     static Looca looca = new Looca();
 
     static Conexao conexao = new Conexao();
@@ -38,8 +36,6 @@ public class ScriptInsercao{
 
     SystemInfo systemInfo = new SystemInfo();
     HardwareAbstractionLayer hardware = systemInfo.getHardware();
-
-
 
 
     public Integer cadastroMaquina(Integer idLanhouse) {
@@ -85,7 +81,7 @@ public class ScriptInsercao{
     }
 
 
-    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede, Integer idGpu   ) {
+    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede, Integer idGpu) {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             List<Double> metricaProcessador = acesso.obterMetricaComponente(idProcessador);
@@ -157,19 +153,18 @@ public class ScriptInsercao{
 
 
                 //Rede - Download
-//
                 Double velocidadeDownload = 0.0;
                 List<RedeInterface> lista = looca.getRede().getGrupoDeInterfaces().getInterfaces();
-                for (int i = 0; lista.size() > i; i++){
-                    if (!lista.get(i).getEnderecoIpv4().isEmpty()){
-                        velocidadeDownload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesEnviados()/1.0;
+                for (int i = 0; lista.size() > i; i++) {
+                    if (!lista.get(i).getEnderecoIpv4().isEmpty()) {
+                        velocidadeDownload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesRecebidos().doubleValue();
                         break;
                     }
                 }
 
                 Double porcentagemVelocidadeDowload = (velocidadeDownload * 100) / 150.0;
 
-                if (porcentagemVelocidadeDowload < metricaRede.get(0)){
+                if (porcentagemVelocidadeDowload < metricaRede.get(0)) {
                     textLog = "Download fora do ideal";
                     statusLog = 2;
                     AcessoJDBC.enviarAlerta("Atenção: Velocidade de Download fora do ideal...");
@@ -178,24 +173,21 @@ public class ScriptInsercao{
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeDownload, dataHora, statusLog, idRede);
-                System.out.println("\nVelocidade de download:" + velocidadeDownload);
+                System.out.println("\nVelocidade de download:" + Conversor.formatarBytes(velocidadeDownload.longValue()));
 
                 //Rede - Upload
-
                 Double velocidadeUpload = 0.0;
 
-                for (int i = 0; lista.size() > i; i++){
-                    if (!lista.get(i).getEnderecoIpv4().isEmpty()){
-                        velocidadeUpload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesRecebidos() / 1.0;
+                for (int i = 0; lista.size() > i; i++) {
+                    if (!lista.get(i).getEnderecoIpv4().isEmpty()) {
+                        velocidadeUpload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesEnviados().doubleValue();
                         break;
                     }
                 }
 
-                System.out.println(lista.size());
-
                 Double porcentagemVelocidadeUpload = (velocidadeUpload * 100) / 1.0;
 
-                if (porcentagemVelocidadeUpload < metricaRede.get(0)){
+                if (porcentagemVelocidadeUpload < metricaRede.get(0)) {
                     textLog = "Upload fora do ideal";
                     statusLog = 2;
                     AcessoJDBC.enviarAlerta("Atenção: Velocidade de Upload fora do ideal...");
@@ -204,7 +196,7 @@ public class ScriptInsercao{
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idRede);
-                System.out.println("Velocidade de upload:" + velocidadeUpload);
+                System.out.println("Velocidade de upload: " + Conversor.formatarBytes(velocidadeUpload.longValue()));
             }
         }, 0, 1000);
     }

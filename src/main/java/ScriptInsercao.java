@@ -81,7 +81,7 @@ public class ScriptInsercao {
     }
 
 
-    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede, Integer idGpu) {
+    public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede, Integer idGpu, Integer idMaquina, Integer idLanHouse) {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             List<Double> metricaProcessador = acesso.obterMetricaComponente(idProcessador);
@@ -101,7 +101,7 @@ public class ScriptInsercao {
                 if (utilizacaoProcessador < metricaProcessador.get(0) || utilizacaoProcessador > metricaProcessador.get(1)) {
                     textLog = "Processador sobrecarregado";
                     statusLog = 2;
-                    AcessoJDBC.enviarAlerta("Atenção: Processador sobrecarregado...");
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 2);
                 } else {
                     textLog = "Processador em uso normal";
                     statusLog = 1;
@@ -117,7 +117,7 @@ public class ScriptInsercao {
                 if (porcMemoria < metricaRam.get(0) || porcMemoria > metricaRam.get(1)) {
                     textLog = "Memória RAM sobrecarregado";
                     statusLog = 2;
-                    AcessoJDBC.enviarAlerta("Atenção: Memória Ram sobrecarregada...");
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 1);
                 } else {
                     textLog = "Memória RAM em uso normal";
                     statusLog = 1;
@@ -143,7 +143,7 @@ public class ScriptInsercao {
                 if (porcentagemDiscoOcupado < metricaDisco.get(0) || porcentagemDiscoOcupado > metricaDisco.get(1)) {
                     textLog = "Disco sobrecarregado";
                     statusLog = 2;
-                    AcessoJDBC.enviarAlerta("Atenção: Disco sobrecarregado...");
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 3);
                 } else {
                     textLog = "Disco em uso normal";
                     statusLog = 1;
@@ -167,7 +167,7 @@ public class ScriptInsercao {
                 if (porcentagemVelocidadeDowload < metricaRede.get(0)) {
                     textLog = "Download fora do ideal";
                     statusLog = 2;
-                    AcessoJDBC.enviarAlerta("Atenção: Velocidade de Download fora do ideal...");
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 4);
                 } else {
                     textLog = "Download ideal";
                     statusLog = 1;
@@ -190,7 +190,7 @@ public class ScriptInsercao {
                 if (porcentagemVelocidadeUpload < metricaRede.get(0)) {
                     textLog = "Upload fora do ideal";
                     statusLog = 2;
-                    AcessoJDBC.enviarAlerta("Atenção: Velocidade de Upload fora do ideal...");
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 4);
                 } else {
                     textLog = "Upload ideal";
                     statusLog = 1;

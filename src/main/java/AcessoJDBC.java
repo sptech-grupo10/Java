@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class AcessoJDBC {
     Conexao conexao = new Conexao();
@@ -112,6 +111,52 @@ public class AcessoJDBC {
         }
     }
 
+    public void enviarAlerta(Integer idMaquina, Integer idLanHouse, Integer fkComponente) {
+
+        String sql = "SELECT" +
+                " COUNT(Log.idLog) AS quantidadeDeLogs," +
+                " TipoComponente.tipoComponente AS tipoDoComponente," +
+                " Maquina.nomeMaquina AS nomeDaMaquina," +
+                " LanHouse.unidade AS unidadeDaLanHouse" +
+                " FROM Log" +
+                " JOIN Componente ON Log.fkComponente = Componente.idComponente" +
+                " JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente" +
+                " JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina" +
+                " JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse" +
+                " WHERE LanHouse.idLanHouse = ?" +
+                " AND Maquina.idMaquina = ?" +
+                " AND Componente.fkTipoComponente = ?" +
+                " AND Log.statuslog = 2" +
+                " AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1 HOUR)" +
+                " GROUP BY" +
+                " tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse";
+
+        RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente}, RetornoSelect.class);
+
+        // Agora você pode usar os valores do DTO conforme necessário
+        Integer quantidadeDeLogs = resultado.getQuantidadeDeLogs();
+        String tipoDoComponente = resultado.getTipoDoComponente();
+        String nomeDaMaquina = resultado.getNomeDaMaquina();
+        String unidadeDaLanHouse = resultado.getUnidadeDaLanHouse();
+
+        if (quantidadeDeLogs % 10 == 0 ){
+            try {
+                String mensagem = String.format("""
+                        Notamos que a máquina %s da Lan House %s está apresentando problemas de %s. Verifique o quantos antes.
+                        """, nomeDaMaquina, unidadeDaLanHouse, tipoDoComponente);
+                StringBuilder msgBuilder = new StringBuilder();
+                msgBuilder.append(mensagem);
+
+                Payload payload = Payload.builder().channel(canalSlack).text(msgBuilder.toString()).build();
+                WebhookResponse wbResp = Slack.getInstance().send(webHooksUrl, payload);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
     public static void enviarAlerta(String mensagem) {
         try {
             StringBuilder msgBuilder = new StringBuilder();
@@ -121,6 +166,33 @@ public class AcessoJDBC {
             WebhookResponse wbResp = Slack.getInstance().send(webHooksUrl, payload);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    //Para conseguir realizar o select e conseguir alocar os valores em variaves (sem usar map) usei uma classe DTO
+    public static class RetornoSelect {
+        private Integer quantidadeDeLogs;
+        private String tipoDoComponente;
+        private String nomeDaMaquina;
+        private String unidadeDaLanHouse;
+
+        // getters e setters
+        // ...
+
+        public Integer getQuantidadeDeLogs() {
+            return quantidadeDeLogs;
+        }
+
+        public String getTipoDoComponente() {
+            return tipoDoComponente;
+        }
+
+        public String getNomeDaMaquina() {
+            return nomeDaMaquina;
+        }
+
+        public String getUnidadeDaLanHouse() {
+            return unidadeDaLanHouse;
         }
     }
 }

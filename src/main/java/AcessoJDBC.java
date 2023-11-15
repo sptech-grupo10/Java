@@ -1,9 +1,17 @@
 import com.github.seratch.jslack.Slack;
 import com.github.seratch.jslack.api.webhook.Payload;
 import com.github.seratch.jslack.api.webhook.WebhookResponse;
+import com.google.common.io.InsecureRecursiveDeleteException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AcessoJDBC {
@@ -111,35 +119,42 @@ public class AcessoJDBC {
         }
     }
 
-    public void enviarAlerta(Integer idMaquina, Integer idLanHouse, Integer fkComponente) {
+    public void enviarAlerta(Integer idMaquina, Integer idLanHouse, Integer fkComponente, Integer idMensagem) {
+
 
         String sql = "SELECT" +
-                " COUNT(Log.idLog) AS quantidadeDeLogs," +
-                " TipoComponente.tipoComponente AS tipoDoComponente," +
-                " Maquina.nomeMaquina AS nomeDaMaquina," +
-                " LanHouse.unidade AS unidadeDaLanHouse" +
-                " FROM Log" +
-                " JOIN Componente ON Log.fkComponente = Componente.idComponente" +
-                " JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente" +
-                " JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina" +
-                " JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse" +
-                " WHERE LanHouse.idLanHouse = ?" +
-                " AND Maquina.idMaquina = ?" +
-                " AND Componente.fkTipoComponente = ?" +
-                " AND Log.statuslog = 2" +
-                " AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1 HOUR)" +
-                " GROUP BY" +
-                " tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse";
+                "COUNT(Log.idLog) AS quantidadeDeLogs," +
+                "TipoComponente.tipoComponente AS tipoDoComponente," +
+                "Maquina.nomeMaquina AS nomeDaMaquina," +
+                "LanHouse.unidade AS unidadeDaLanHouse" +
+                "FROM Log" +
+                "JOIN Componente ON Log.fkComponente = Componente.idComponente" +
+                "JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente" +
+                "JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina" +
+                "JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse" +
+                "WHERE LanHouse.idLanHouse = ?" +
+                "AND Maquina.idMaquina = ?" +
+                "AND Componente.fkTipoComponente = ?" +
+                "AND Log.statuslog = 2" +
+                "AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 0.33 HOUR)" +
+                "GROUP BY" +
+                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse";
 
         RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente}, RetornoSelect.class);
 
-        // Agora você pode usar os valores do DTO conforme necessário
         Integer quantidadeDeLogs = resultado.getQuantidadeDeLogs();
         String tipoDoComponente = resultado.getTipoDoComponente();
         String nomeDaMaquina = resultado.getNomeDaMaquina();
         String unidadeDaLanHouse = resultado.getUnidadeDaLanHouse();
 
-        if (quantidadeDeLogs % 10 == 0 ){
+//        String mensagemAlerta = "";
+//        if (idMensagem.equals(2)){
+//            mensagemAlerta = "quase";
+//        } else if (idMensagem.equals(3)) {
+//            mensagemAlerta = "";
+//        }
+
+        if (quantidadeDeLogs.equals(10)) {
             try {
                 String mensagem = String.format("""
                         Notamos que a máquina %s da Lan House %s está apresentando problemas de %s. Verifique o quantos antes.
@@ -153,23 +168,57 @@ public class AcessoJDBC {
                 e.printStackTrace();
             }
         }
-
     }
 
 
-    public static void enviarAlerta(String mensagem) {
-        try {
-            StringBuilder msgBuilder = new StringBuilder();
-            msgBuilder.append(mensagem);
 
-            Payload payload = Payload.builder().channel(canalSlack).text(msgBuilder.toString()).build();
-            WebhookResponse wbResp = Slack.getInstance().send(webHooksUrl, payload);
+    public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu) {
+
+        String diretorio = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
+
+        // Crie um formato de data para incorporar no nome do arquivo
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String dataFormatada = dateFormat.format(new Date());
+
+        String nomeArquivo = "log_" + dataFormatada + ".txt";
+        String caminhoCompleto = diretorio + "\\" + nomeArquivo;
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String dataHoje = LocalDateTime.now().format(dtf);
+
+        try {
+            File hist = new File(caminhoCompleto);
+
+            if (!hist.exists()) {
+                hist.createNewFile();
+            }
+
+            BufferedWriter buffer = new BufferedWriter(new FileWriter(caminhoCompleto, true));
+
+            String conteudo = "Id Maquina: " + idMaquina +
+                    "\nUtilização RAM: " + uRam +
+                    "\nUtilização CPU: " + uProcessador +
+                    "\nUtilização Disco: " + uDisco +
+                    "\nUtilização Download: " + uDown +
+                    "\nUtilização Upload: " + uUp +
+                    "\nUtilização GPU: " + uGpu +
+                    "\nData e hora: " + dataHoje
+                    ;
+
+            buffer.write(conteudo);
+            buffer.newLine();
+            buffer.close();
+
+            System.out.println("Verifique seu log armazenado em: " + caminhoCompleto);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    //Para conseguir realizar o select e conseguir alocar os valores em variaves (sem usar map) usei uma classe DTO
+
+
+    //Para conseguir realizar o select e conseguir alocar os valores em variaves (sem usar map) usei classes DTO
     public static class RetornoSelect {
         private Integer quantidadeDeLogs;
         private String tipoDoComponente;
@@ -194,5 +243,32 @@ public class AcessoJDBC {
         public String getUnidadeDaLanHouse() {
             return unidadeDaLanHouse;
         }
+
+
+}
+
+    public static class RetornoParaLog {
+        private String tipoDoComponente;
+        private String nomeDaMaquina;
+        private String unidadeDaLanHouse;
+        private String dataHora;
+
+        // getters e setters
+        // ...
+
+
+        public String getTipoDoComponente() {
+            return tipoDoComponente;
+        }
+
+        public String getNomeDaMaquina() {
+            return nomeDaMaquina;
+        }
+
+        public String getUnidadeDaLanHouse() {
+            return unidadeDaLanHouse;
+        }
+        public String getDataHora(){return dataHora;}
+
     }
 }

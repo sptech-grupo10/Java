@@ -72,7 +72,7 @@ public class ScriptInsercao {
 
         //cadastrando gpu - inovacao
 
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("GPU"), acesso.buscarOuCadastrarMetricaComponente(0.0, 90.0, "%")));
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("GPU"), acesso.buscarOuCadastrarMetricaComponente(0.0, 95.0, "%")));
         acesso.cadastrarEspecsComponente("Nome da placa Gráfica", hardware.getGraphicsCards().get(0).getName(), idsComponentes.get(4));
         acesso.cadastrarEspecsComponente("Marca placa gráfica", hardware.getGraphicsCards().get(0).getVendor(), idsComponentes.get(4));
         acesso.cadastrarEspecsComponente("Versão do driver", hardware.getGraphicsCards().get(0).getVersionInfo(), idsComponentes.get(4));
@@ -88,6 +88,7 @@ public class ScriptInsercao {
             List<Double> metricaRam = acesso.obterMetricaComponente(idRam);
             List<Double> metricaDisco = acesso.obterMetricaComponente(idDisco);
             List<Double> metricaRede = acesso.obterMetricaComponente(idRede);
+            List<Double> metricaGpu = acesso.obterMetricaComponente(idGpu);
 
 
             @Override
@@ -95,9 +96,66 @@ public class ScriptInsercao {
                 Object dataHora = LocalDateTime.now();
                 String textLog;
                 Integer statusLog;
+                //foi preciso mudar a posição das utilizações para usar no método de log
 
                 // Processador
                 Double utilizacaoProcessador = looca.getProcessador().getUso();
+
+                // Memória RAM
+                Double memoriaTotal = Double.valueOf(looca.getMemoria().getTotal());
+                Double memoriaEmUso = Double.valueOf(looca.getMemoria().getEmUso());
+                Double porcMemoria = Double.valueOf((memoriaEmUso * 100) / memoriaTotal);
+
+                // Disco
+                Double valorDisponivelDisco = Double.valueOf(looca.getGrupoDeDiscos().getVolumes().get(0).getDisponivel() / 8e+9);
+                Double valorTotalDisco = Double.valueOf(looca.getGrupoDeDiscos().getVolumes().get(0).getTotal() / 8e+9);
+
+                BigDecimal valorDisponivelBigDecimal = new BigDecimal(valorDisponivelDisco);
+                valorDisponivelBigDecimal = valorDisponivelBigDecimal.setScale(2, RoundingMode.HALF_UP);
+                Double valorDisponivelArredondado = valorDisponivelBigDecimal.doubleValue();
+
+                BigDecimal valorTotalBigDecimal = new BigDecimal(valorTotalDisco);
+                valorTotalBigDecimal = valorTotalBigDecimal.setScale(2, RoundingMode.HALF_UP);
+                Double valorTotalArredondado = valorTotalBigDecimal.doubleValue();
+
+                Double discoOcupado = (valorTotalArredondado - valorDisponivelArredondado);
+                Double porcentagemDiscoOcupado = ((discoOcupado * 100) / valorTotalArredondado);
+
+                //Rede - Download
+                Double velocidadeDownload = 0.0;
+                List<RedeInterface> lista = looca.getRede().getGrupoDeInterfaces().getInterfaces();
+                for (int i = 0; lista.size() > i; i++) {
+                    if (!lista.get(i).getEnderecoIpv4().isEmpty()) {
+                        velocidadeDownload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesRecebidos().doubleValue();
+                        break;
+                    }
+                }
+
+                Double porcentagemVelocidadeDowload = (velocidadeDownload * 100) / 150.0;
+
+                //Rede - Upload
+                Double velocidadeUpload = 0.0;
+
+                for (int i = 0; lista.size() > i; i++) {
+                    if (!lista.get(i).getEnderecoIpv4().isEmpty()) {
+                        velocidadeUpload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesEnviados().doubleValue();
+                        break;
+                    }
+                }
+
+                Double porcentagemVelocidadeUpload = (velocidadeUpload * 100) / 1.0;
+
+                // GPU - Inovação
+                Double bytesGpu = Double.valueOf(hardware.getGraphicsCards().get(0).getVRam());
+                Double totalGpu = 5981045185.00;
+                Double porcGpu = (bytesGpu/totalGpu) * 100;
+
+
+
+
+
+
+
                 if (utilizacaoProcessador < metricaProcessador.get(0) || utilizacaoProcessador > metricaProcessador.get(1)) {
                     textLog = "Processador sobrecarregado";
                     statusLog = 3;
@@ -118,9 +176,6 @@ public class ScriptInsercao {
                 System.out.printf("\n\nUtilização do processador: %d%%", utilizacaoProcessador.shortValue());
 
                 // Memória RAM
-                Double memoriaTotal = Double.valueOf(looca.getMemoria().getTotal());
-                Double memoriaEmUso = Double.valueOf(looca.getMemoria().getEmUso());
-                Double porcMemoria = Double.valueOf((memoriaEmUso * 100) / memoriaTotal);
 
                 if (porcMemoria < metricaRam.get(0) || porcMemoria > metricaRam.get(1)) {
                     textLog = "Memória RAM sobrecarregado";
@@ -140,19 +195,6 @@ public class ScriptInsercao {
                 System.out.printf("\nUtilização da memória RAM: %d%%", porcMemoria.shortValue());
 
                 // Disco
-                Double valorDisponivelDisco = Double.valueOf(looca.getGrupoDeDiscos().getVolumes().get(0).getDisponivel() / 8e+9);
-                Double valorTotalDisco = Double.valueOf(looca.getGrupoDeDiscos().getVolumes().get(0).getTotal() / 8e+9);
-
-                BigDecimal valorDisponivelBigDecimal = new BigDecimal(valorDisponivelDisco);
-                valorDisponivelBigDecimal = valorDisponivelBigDecimal.setScale(2, RoundingMode.HALF_UP);
-                Double valorDisponivelArredondado = valorDisponivelBigDecimal.doubleValue();
-
-                BigDecimal valorTotalBigDecimal = new BigDecimal(valorTotalDisco);
-                valorTotalBigDecimal = valorTotalBigDecimal.setScale(2, RoundingMode.HALF_UP);
-                Double valorTotalArredondado = valorTotalBigDecimal.doubleValue();
-
-                Double discoOcupado = (valorTotalArredondado - valorDisponivelArredondado);
-                Double porcentagemDiscoOcupado = ((discoOcupado * 100) / valorTotalArredondado);
 
                 if (porcentagemDiscoOcupado < metricaDisco.get(0) || porcentagemDiscoOcupado > metricaDisco.get(1)) {
                     textLog = "Disco sobrecarregado";
@@ -174,16 +216,6 @@ public class ScriptInsercao {
 
 
                 //Rede - Download
-                Double velocidadeDownload = 0.0;
-                List<RedeInterface> lista = looca.getRede().getGrupoDeInterfaces().getInterfaces();
-                for (int i = 0; lista.size() > i; i++) {
-                    if (!lista.get(i).getEnderecoIpv4().isEmpty()) {
-                        velocidadeDownload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesRecebidos().doubleValue();
-                        break;
-                    }
-                }
-
-                Double porcentagemVelocidadeDowload = (velocidadeDownload * 100) / 150.0;
 
                 if (porcentagemVelocidadeDowload < metricaRede.get(0)) {
                     textLog = "Download fora do ideal";
@@ -203,16 +235,6 @@ public class ScriptInsercao {
                 System.out.println("\nVelocidade de download:" + Conversor.formatarBytes(velocidadeDownload.longValue()));
 
                 //Rede - Upload
-                Double velocidadeUpload = 0.0;
-
-                for (int i = 0; lista.size() > i; i++) {
-                    if (!lista.get(i).getEnderecoIpv4().isEmpty()) {
-                        velocidadeUpload = looca.getRede().getGrupoDeInterfaces().getInterfaces().get(i).getBytesEnviados().doubleValue();
-                        break;
-                    }
-                }
-
-                Double porcentagemVelocidadeUpload = (velocidadeUpload * 100) / 1.0;
 
                 if (porcentagemVelocidadeUpload < metricaRede.get(0)) {
                     textLog = "Upload fora do ideal";
@@ -230,6 +252,21 @@ public class ScriptInsercao {
                 }
                 acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idRede);
                 System.out.println("Velocidade de upload: " + Conversor.formatarBytes(velocidadeUpload.longValue()));
+
+                if (porcGpu < metricaGpu.get(0)){
+                    textLog = "Placa gráfica sobrecarregando";
+                    statusLog = 3;
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 3);
+                } else if (porcGpu < (metricaGpu.get(0) * 0.85)) {
+                    textLog = "Placa gráfica quase sobrecarregando";
+                    statusLog = 2;
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);
+                } else {
+                    textLog = "Placa gráfica ideal";
+                    statusLog = 1;
+                }
+                acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idGpu);
+                System.out.println("Utilização placa gráfica: " + Conversor.formatarBytes(bytesGpu.longValue()));
             }
         }, 0, 1000);
     }

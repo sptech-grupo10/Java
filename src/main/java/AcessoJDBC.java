@@ -177,10 +177,10 @@ public class AcessoJDBC {
 
     public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu) {
 
+
         //mudar de acordo com a máquina
         String diretorio = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
 
-        // Crie um formato de data para incorporar no nome do arquivo
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dataFormatada = dateFormat.format(new Date());
 

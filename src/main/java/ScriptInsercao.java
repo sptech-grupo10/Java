@@ -147,7 +147,7 @@ public class ScriptInsercao {
 
                 // GPU - Inovação
                 Double bytesGpu = Double.valueOf(hardware.getGraphicsCards().get(0).getVRam());
-                Double totalGpu = 5981045185.00;
+                Double totalGpu = 598104518589.00;
                 Double porcGpu = (bytesGpu/totalGpu) * 100;
 
 
@@ -155,17 +155,20 @@ public class ScriptInsercao {
 
 
 
+                Boolean enviarAlerta = false;
+
+                //Processador
 
                 if (utilizacaoProcessador < metricaProcessador.get(0) || utilizacaoProcessador > metricaProcessador.get(1)) {
                     textLog = "Processador sobrecarregado";
                     statusLog = 3;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 3);
+                    enviarAlerta = true;
                 }
                 else if (utilizacaoProcessador < (metricaProcessador.get(0) * 0.85) ||
                         utilizacaoProcessador > (metricaProcessador.get(1) * 0.85)) {
                     textLog = "Processador quase sobrecarregado";
                     statusLog = 2;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 2);
+                    enviarAlerta = true;
 //                    acesso.construirLog(idMaquina, utilizacaoProcessador, );
                 }
                 else {
@@ -173,46 +176,73 @@ public class ScriptInsercao {
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, utilizacaoProcessador, dataHora, statusLog, idProcessador);
+
+                if (enviarAlerta && statusLog.equals(2)){
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 2);
+                } else if (enviarAlerta && statusLog.equals(3)) {
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 3);
+                }
+
                 System.out.printf("\n\nUtilização do processador: %d%%", utilizacaoProcessador.shortValue());
+                enviarAlerta = false;
+
 
                 // Memória RAM
 
                 if (porcMemoria < metricaRam.get(0) || porcMemoria > metricaRam.get(1)) {
                     textLog = "Memória RAM sobrecarregado";
-                    statusLog = 1;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 3);
+                    statusLog = 3;
+                    enviarAlerta = true;
                 }
                 else if (porcMemoria < (metricaRam.get(0) * 0.85) || porcMemoria > (metricaRam.get(1) * 0.85)) {
                     textLog = "Memória RAM quase sobrecarregado";
                     statusLog = 2;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 2);
+                    enviarAlerta = true;
                 }
                 else {
                     textLog = "Memória RAM em uso normal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, porcMemoria, dataHora, statusLog, idRam);
+
+                if (enviarAlerta && statusLog.equals(2)){
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 2);
+                } else if (enviarAlerta && statusLog.equals(3)) {
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 3);
+                }
+
                 System.out.printf("\nUtilização da memória RAM: %d%%", porcMemoria.shortValue());
+                enviarAlerta = false;
+
 
                 // Disco
 
                 if (porcentagemDiscoOcupado < metricaDisco.get(0) || porcentagemDiscoOcupado > metricaDisco.get(1)) {
                     textLog = "Disco sobrecarregado";
                     statusLog = 3;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 3, 3);
+                    enviarAlerta = true;
                 }
                 else if (porcentagemDiscoOcupado < (metricaDisco.get(0) * 0.85)
                         || porcentagemDiscoOcupado > (metricaDisco.get(1) * 0.85)) {
                     textLog = "Disco quase sobrecarregado";
                     statusLog = 2;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 3, 2);
+                    enviarAlerta = true;
                 }
                 else {
                     textLog = "Disco em uso normal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, porcentagemDiscoOcupado, dataHora, statusLog, idDisco);
+
+                if (enviarAlerta && statusLog.equals(2)){
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 3, 2);
+                } else if (enviarAlerta && statusLog.equals(3)) {
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 3, 3);
+                }
+
                 System.out.printf("\nUtilização de Disco: %d%%", porcentagemDiscoOcupado.shortValue());
+                enviarAlerta = false;
+
 
 
                 //Rede - Download
@@ -220,53 +250,79 @@ public class ScriptInsercao {
                 if (porcentagemVelocidadeDowload < metricaRede.get(0)) {
                     textLog = "Download fora do ideal";
                     statusLog = 2;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                    enviarAlerta = true;
                 }
                 else if (porcentagemVelocidadeDowload < (metricaRede.get(0) * 0.85)) {
                     textLog = "Download quase fora do ideal";
                     statusLog = 2;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                    enviarAlerta = true;
                 }
                 else {
                     textLog = "Download ideal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeDownload, dataHora, statusLog, idRede);
+
+                if (enviarAlerta && statusLog.equals(2)){
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                } else if (enviarAlerta && statusLog.equals(3)) {
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                }
+
                 System.out.println("\nVelocidade de download:" + Conversor.formatarBytes(velocidadeDownload.longValue()));
+                enviarAlerta = false;
+
 
                 //Rede - Upload
 
                 if (porcentagemVelocidadeUpload < metricaRede.get(0)) {
                     textLog = "Upload fora do ideal";
                     statusLog = 3;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                    enviarAlerta = true;
                 }
                 else if (porcentagemVelocidadeDowload < (metricaRede.get(0) * 0.85)) {
                     textLog = "Upload quase fora do ideal";
                     statusLog = 2;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                    enviarAlerta = true;
                 }
                 else {
                     textLog = "Upload ideal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idRede);
+
+                if (enviarAlerta && statusLog.equals(2)){
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                } else if (enviarAlerta && statusLog.equals(3)) {
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                }
+
                 System.out.println("Velocidade de upload: " + Conversor.formatarBytes(velocidadeUpload.longValue()));
+                enviarAlerta = false;
+
 
                 if (porcGpu < metricaGpu.get(0)){
                     textLog = "Placa gráfica sobrecarregando";
                     statusLog = 3;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 3);
+                    enviarAlerta = true;
                 } else if (porcGpu < (metricaGpu.get(0) * 0.85)) {
                     textLog = "Placa gráfica quase sobrecarregando";
                     statusLog = 2;
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);
+                    enviarAlerta = true;
                 } else {
                     textLog = "Placa gráfica ideal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idGpu);
+
+                if (enviarAlerta && statusLog.equals(2)){
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);
+                } else if (enviarAlerta && statusLog.equals(3)) {
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 3);
+                }
+
                 System.out.println("Utilização placa gráfica: " + Conversor.formatarBytes(bytesGpu.longValue()));
+//                enviarAlerta = false;
             }
         }, 0, 1000);
     }

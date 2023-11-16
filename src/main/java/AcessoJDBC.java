@@ -122,25 +122,28 @@ public class AcessoJDBC {
     public void enviarAlerta(Integer idMaquina, Integer idLanHouse, Integer fkComponente, Integer idMensagem) {
 
 
-        String sql = "SELECT" +
-                "COUNT(Log.idLog) AS quantidadeDeLogs," +
-                "TipoComponente.tipoComponente AS tipoDoComponente," +
-                "Maquina.nomeMaquina AS nomeDaMaquina," +
-                "LanHouse.unidade AS unidadeDaLanHouse" +
-                "FROM Log" +
-                "JOIN Componente ON Log.fkComponente = Componente.idComponente" +
-                "JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente" +
-                "JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina" +
-                "JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse" +
-                "WHERE LanHouse.idLanHouse = ?" +
-                "AND Maquina.idMaquina = ?" +
-                "AND Componente.fkTipoComponente = ?" +
-                "AND Log.statuslog = 2" +
-                "AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 0.33 HOUR)" +
-                "GROUP BY" +
-                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse";
+        String sql = "SELECT " +
+                "COUNT(Log.idLog) AS quantidadeDeLogs, " +
+                "TipoComponente.tipoComponente AS tipoDoComponente, " +
+                "Maquina.nomeMaquina AS nomeDaMaquina, " +
+                "LanHouse.unidade AS unidadeDaLanHouse " +
+                "FROM Log " +
+                "JOIN Componente ON Log.fkComponente = Componente.idComponente " +
+                "JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente " +
+                "JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina " +
+                "JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse " +
+                "WHERE LanHouse.idLanHouse = ? " +
+                "AND Maquina.idMaquina = ? " +
+                "AND Componente.fkTipoComponente = ? " +
+                "AND Log.statuslog = ? " +
+                "AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 0.33 HOUR) " +
+                "GROUP BY " +
+                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse, Log.dataLog " +
+                "ORDER BY " +
+                "Log.dataLog DESC " +
+                "LIMIT 1";
 
-        RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente}, RetornoSelect.class);
+        RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente, idMensagem}, RetornoSelect.class);
 
         Integer quantidadeDeLogs = resultado.getQuantidadeDeLogs();
         String tipoDoComponente = resultado.getTipoDoComponente();

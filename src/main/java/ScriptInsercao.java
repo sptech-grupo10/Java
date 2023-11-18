@@ -147,7 +147,7 @@ public class ScriptInsercao {
 
                 // GPU - Inovação
                 Double bytesGpu = Double.valueOf(hardware.getGraphicsCards().get(0).getVRam());
-                Double totalGpu = 598104518589.00;
+                Double totalGpu = 5981045182.00;
                 Double porcGpu = (bytesGpu/totalGpu) * 100;
 
 
@@ -313,7 +313,8 @@ public class ScriptInsercao {
                     textLog = "Placa gráfica ideal";
                     statusLog = 1;
                 }
-                acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idGpu);
+                acesso.insercaoDados(textLog, porcGpu, dataHora, statusLog, idGpu);
+                System.out.println(bytesGpu);
 
                 if (enviarAlerta && statusLog.equals(2)){
                     acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);

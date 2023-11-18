@@ -17,7 +17,7 @@ import java.util.List;
 public class AcessoJDBC {
     Conexao conexao = new Conexao();
     JdbcTemplate con = conexao.getConexaoDoBanco();
-    private static String webHooksUrl = "https://hooks.slack.com/services/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";
+    private static String webHooksUrl = "https://hooks.slack.com/services/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";
     private static String oAuthToken = "xoxb-6146401163538-6147415712946-6fi0np5JSHztzuFkq5ZI8AFf";
     private static String canalSlack = "alertas";
 

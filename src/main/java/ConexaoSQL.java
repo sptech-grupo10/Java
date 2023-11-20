@@ -17,7 +17,7 @@ public class ConexaoSQL {
         this.connection = new JdbcTemplate(dataSource);
     }
 
-    public JdbcTemplate getConnection() {
+    public JdbcTemplate getConexaoDoBanco() {
         return this.connection;
     }
 }

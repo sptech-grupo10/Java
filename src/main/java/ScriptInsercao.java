@@ -28,7 +28,7 @@ import java.util.*;
 public class ScriptInsercao {
     static Looca looca = new Looca();
 
-    static Conexao conexao = new Conexao();
+    static ConexaoSQL conexao = new ConexaoSQL();
 
     static JdbcTemplate con = conexao.getConexaoDoBanco();
 

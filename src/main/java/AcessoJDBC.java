@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 public class AcessoJDBC {
-    Conexao conexao = new Conexao();
+    ConexaoSQL conexao = new ConexaoSQL();
     JdbcTemplate con = conexao.getConexaoDoBanco();
     private static String webHooksUrl = "https://hooks.slack.com/services/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";
     private static String oAuthToken = "xoxb-6146401163538-6147415712946-6fi0np5JSHztzuFkq5ZI8AFf";
@@ -47,7 +47,7 @@ public class AcessoJDBC {
         idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, nomeMaquina, fkLanhouse);
 
         if (idMaquinas.isEmpty()) {
-            con.update("INSERT INTO Maquina VALUES (null, ?, ?)", nomeMaquina, fkLanhouse);
+            con.update("INSERT INTO Maquina(nomeMaquina, fkLanhouse) VALUES (?, ?)", nomeMaquina, fkLanhouse);
             System.out.println("Máquina " + nomeMaquina + " cadastrada");
             idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, nomeMaquina, fkLanhouse);
         }
@@ -62,7 +62,7 @@ public class AcessoJDBC {
         especComponenteSel = con.queryForList("SELECT idEspecificacaoComponente FROM EspecificacaoComponente WHERE especificacao = ? AND valorEspecificacao = ?", Integer.class, especificacao, valorEspec);
 
         if (especComponenteSel.isEmpty()) {
-            con.update("INSERT INTO EspecificacaoComponente VALUES (null, ?, ?, ?)", especificacao, valorEspec, fkComponente);
+            con.update("INSERT INTO EspecificacaoComponente(especificacao, valorEspecificacao, fkComponente) VALUES (?, ?, ?)", especificacao, valorEspec, fkComponente);
             especComponenteSel = con.queryForList("SELECT idEspecificacaoComponente FROM EspecificacaoComponente WHERE especificacao = ? AND valorEspecificacao = ?", Integer.class, especificacao, valorEspec);
         }
 
@@ -71,6 +71,7 @@ public class AcessoJDBC {
     }
 
     public Integer buscarIdTipoComponente(String tipoComponente) {
+        System.out.println(tipoComponente);
         List<Integer> idComponentes = con.queryForList("SELECT idTipoComponente FROM TipoComponente WHERE tipoComponente = ?", Integer.class, tipoComponente);
         return idComponentes.get(0);
     }
@@ -80,7 +81,7 @@ public class AcessoJDBC {
         metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, minMetrica, maxMetrica, unidadeMedida);
 
         if (metricaComponenteSel.isEmpty()) {
-            con.update("INSERT INTO MetricaComponente VALUES (null, ?, ?, ?)", minMetrica, maxMetrica, unidadeMedida);
+            con.update("INSERT INTO MetricaComponente(minMetrica, maxMetrica, unidadeMedida) VALUES (?, ?, ?)", minMetrica, maxMetrica, unidadeMedida);
             metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, minMetrica, maxMetrica, unidadeMedida);
         }
 
@@ -94,7 +95,7 @@ public class AcessoJDBC {
         componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica);
 
         if (componenteSel.isEmpty()) {
-            con.update("INSERT INTO Componente VALUES(null, ?, ?, ?, ?)", idMaquina, valorTotal, idTipoComponente, idMetrica);
+            con.update("INSERT INTO Componente (fkMaquina, valorTotal, fkTipoComponente, fkMetricaComponente) VALUES(?, ?, ?, ?)", idMaquina, valorTotal, idTipoComponente, idMetrica);
             componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica);
         }
 
@@ -113,9 +114,9 @@ public class AcessoJDBC {
 
     public void insercaoDados(String textLog, Double valor, Object timer, Integer statusLog, Integer idComponente) {
         if (textLog.contains("Download") || textLog.contains("Upload")) {
-            con.update("INSERT INTO Log VALUES (null, ?, ?, ?, ?, ?)", textLog, valor.longValue(), timer, statusLog, idComponente);
+            con.update("INSERT INTO Log(textLog, valor, dataLog, statusLog, fkComponente) VALUES (?, ?, ?, ?, ?)", textLog, valor.longValue(), timer, statusLog, idComponente);
         } else {
-            con.update("INSERT INTO Log VALUES (null, ?, ?, ?, ?, ?)", textLog, valor.shortValue(), timer, statusLog, idComponente);
+            con.update("INSERT INTO Log(textLog, valor, dataLog, statusLog, fkComponente) VALUES (?, ?, ?, ?, ?)", textLog, valor.shortValue(), timer, statusLog, idComponente);
         }
     }
 

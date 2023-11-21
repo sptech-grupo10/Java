@@ -179,8 +179,10 @@ public class ScriptInsercao {
 
                 if (enviarAlerta && statusLog.equals(2)){
                     acesso.enviarAlerta(idMaquina, idLanHouse, 2, 2);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 2, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 }
 
                 System.out.printf("\n\nUtilização do processador: %d%%", utilizacaoProcessador.shortValue());
@@ -207,8 +209,10 @@ public class ScriptInsercao {
 
                 if (enviarAlerta && statusLog.equals(2)){
                     acesso.enviarAlerta(idMaquina, idLanHouse, 1, 2);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 1, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 }
 
                 System.out.printf("\nUtilização da memória RAM: %d%%", porcMemoria.shortValue());
@@ -236,8 +240,10 @@ public class ScriptInsercao {
 
                 if (enviarAlerta && statusLog.equals(2)){
                     acesso.enviarAlerta(idMaquina, idLanHouse, 3, 2);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 3, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 }
 
                 System.out.printf("\nUtilização de Disco: %d%%", porcentagemDiscoOcupado.shortValue());
@@ -265,8 +271,10 @@ public class ScriptInsercao {
 
                 if (enviarAlerta && statusLog.equals(2)){
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 }
 
                 System.out.println("\nVelocidade de download:" + Conversor.formatarBytes(velocidadeDownload.longValue()));
@@ -293,8 +301,10 @@ public class ScriptInsercao {
 
                 if (enviarAlerta && statusLog.equals(2)){
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 }
 
                 System.out.println("Velocidade de upload: " + Conversor.formatarBytes(velocidadeUpload.longValue()));
@@ -312,14 +322,17 @@ public class ScriptInsercao {
                 } else {
                     textLog = "Placa gráfica ideal";
                     statusLog = 1;
+
                 }
                 acesso.insercaoDados(textLog, porcGpu, dataHora, statusLog, idGpu);
                 System.out.println(bytesGpu);
-
+//
                 if (enviarAlerta && statusLog.equals(2)){
                     acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 5, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
                 }
 
                 System.out.println("Utilização placa gráfica: " + Conversor.formatarBytes(bytesGpu.longValue()));

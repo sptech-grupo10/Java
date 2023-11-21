@@ -15,10 +15,13 @@ import java.util.Date;
 import java.util.List;
 
 public class AcessoJDBC {
+    //dev
+    //Conexao conexao = new Conexao();
+    //prod
     ConexaoSQL conexao = new ConexaoSQL();
     JdbcTemplate con = conexao.getConexaoDoBanco();
-    private static String webHooksUrl = "https://hooks.slack.com/services/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";
-    private static String oAuthToken = "xoxb-6146401163538-6147415712946-6fi0np5JSHztzuFkq5ZI8AFf";
+    private static String webHooksUrl = "https://hooks.slack.com/services/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";
+    private static String oAuthToken = "xoxb-6146401163538-6147415712946-zk8AWszgohTqmUfQhaSuzFnV";
     private static String canalSlack = "alertas";
 
 
@@ -124,7 +127,7 @@ public class AcessoJDBC {
 
 
         String sql = "SELECT " +
-                "COUNT(Log.idLog) AS quantidadeDeLogs, " +
+                "COUNT(*) AS quantidadeDeLogs, " +
                 "TipoComponente.tipoComponente AS tipoDoComponente, " +
                 "Maquina.nomeMaquina AS nomeDaMaquina, " +
                 "LanHouse.unidade AS unidadeDaLanHouse " +
@@ -139,10 +142,13 @@ public class AcessoJDBC {
                 "AND Log.statuslog = ? " +
                 "AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 0.33 HOUR) " +
                 "GROUP BY " +
-                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse, Log.dataLog " +
+                "TipoComponente.tipoComponente, " +
+                "Maquina.nomeMaquina, " +
+                "LanHouse.unidade " +
                 "ORDER BY " +
-                "Log.dataLog DESC " +
-                "LIMIT 1";
+                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse " +
+                "LIMIT 1;";
+
 
         RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente, idMensagem}, RetornoSelect.class);
 
@@ -158,7 +164,7 @@ public class AcessoJDBC {
 //            mensagemAlerta = "";
 //        }
 
-        if (quantidadeDeLogs.equals(10)) {
+//        if (quantidadeDeLogs.equals(10)) {
             try {
                 String mensagem = String.format("""
                         Notamos que a máquina %s da Lan House %s está apresentando problemas de %s. Verifique o quantos antes.
@@ -171,7 +177,7 @@ public class AcessoJDBC {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        //}
     }
 
 
@@ -180,7 +186,7 @@ public class AcessoJDBC {
 
 
         //mudar de acordo com a máquina
-        String diretorio = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
+        String diretorio = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios";
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dataFormatada = dateFormat.format(new Date());

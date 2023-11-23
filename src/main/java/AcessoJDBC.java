@@ -1,3 +1,7 @@
+import Classes.EspecificacoesComponente;
+import Classes.Maquina;
+import Classes.MetricaComponente;
+import Classes.TipoComponente;
 import com.github.seratch.jslack.Slack;
 import com.github.seratch.jslack.api.webhook.Payload;
 import com.github.seratch.jslack.api.webhook.WebhookResponse;
@@ -7,23 +11,21 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class AcessoJDBC {
-    //dev
-    //Conexao conexao = new Conexao();
-    //prod
     ConexaoSQL conexao = new ConexaoSQL();
-    JdbcTemplate con = conexao.getConexaoDoBanco();
-    private static String webHooksUrl = "https://hooks.slack.com/services/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";
-    private static String oAuthToken = "xoxb-6146401163538-6147415712946-zk8AWszgohTqmUfQhaSuzFnV";
+    JdbcTemplate con = conexao.getConnection();
+    private static String webHooksUrl = "https://hooks.slack.com/services/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";
+    private static String oAuthToken = "xoxb-6146401163538-6147415712946-6fi0np5JSHztzuFkq5ZI8AFf";
     private static String canalSlack = "alertas";
-
 
     public Integer obterIdLanhousePorCodigo(String codigoAcesso) {
         List<Integer> idLanhouse = con.queryForList("SELECT idLanhouse FROM Lanhouse WHERE codigoAcesso = ?", Integer.class, codigoAcesso);
@@ -40,56 +42,48 @@ public class AcessoJDBC {
 
     public String buscarUsuario(String email, String senha) {
         List<String> usuario = con.queryForList("SELECT nome FROM Usuario WHERE email = ? AND senha = ?", String.class, email, senha);
-        String nomeUsuario = usuario.get(0);
-        return nomeUsuario;
+        return usuario.get(0);
     }
 
-    public Integer cadastrarMaquina(String nomeMaquina, Integer fkLanhouse) {
+    public Integer cadastrarMaquina(Maquina maquina) {
         List<Integer> idMaquinas = new ArrayList<>();
 
-        idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, nomeMaquina, fkLanhouse);
+        idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, maquina.getNomeMaquina(), maquina.getFkLanHouse());
 
         if (idMaquinas.isEmpty()) {
-            con.update("INSERT INTO Maquina(nomeMaquina, fkLanhouse) VALUES (?, ?)", nomeMaquina, fkLanhouse);
-            System.out.println("Máquina " + nomeMaquina + " cadastrada");
-            idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, nomeMaquina, fkLanhouse);
+            con.update("INSERT INTO Maquina(nomeMaquina, fkLanhouse) VALUES (?, ?)", maquina.getNomeMaquina(), maquina.getFkLanHouse());
+            System.out.println("Máquina " + maquina.getNomeMaquina() + " cadastrada");
+            idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, maquina.getNomeMaquina(), maquina.getFkLanHouse());
         }
-        System.out.println("Máquina " + nomeMaquina + " localizada");
+        System.out.println("Máquina " + maquina.getNomeMaquina() + " localizada");
 
-        Integer idMaquina = idMaquinas.get(0);
-        return idMaquina;
+        return idMaquinas.get(0);
     }
 
-    public Integer cadastrarEspecsComponente(String especificacao, String valorEspec, Integer fkComponente) {
+    public void cadastrarEspecsComponente(EspecificacoesComponente especificacaoComponente) {
         List<Integer> especComponenteSel = new ArrayList<>();
-        especComponenteSel = con.queryForList("SELECT idEspecificacaoComponente FROM EspecificacaoComponente WHERE especificacao = ? AND valorEspecificacao = ?", Integer.class, especificacao, valorEspec);
+        especComponenteSel = con.queryForList("SELECT idEspecificacaoComponente FROM EspecificacaoComponente WHERE especificacao = ? AND valorEspecificacao = ? AND fkComponente = ?", Integer.class, especificacaoComponente.getEspecificacao(), especificacaoComponente.getValor(), especificacaoComponente.getFkComponente());
 
         if (especComponenteSel.isEmpty()) {
-            con.update("INSERT INTO EspecificacaoComponente(especificacao, valorEspecificacao, fkComponente) VALUES (?, ?, ?)", especificacao, valorEspec, fkComponente);
-            especComponenteSel = con.queryForList("SELECT idEspecificacaoComponente FROM EspecificacaoComponente WHERE especificacao = ? AND valorEspecificacao = ?", Integer.class, especificacao, valorEspec);
+            con.update("INSERT INTO EspecificacaoComponente(especificacao, valorEspecificacao, fkComponente) VALUES (?, ?, ?)", especificacaoComponente.getEspecificacao(), especificacaoComponente.getValor(), especificacaoComponente.getFkComponente());
         }
-
-        Integer especComponente = especComponenteSel.get(0);
-        return especComponente;
     }
 
-    public Integer buscarIdTipoComponente(String tipoComponente) {
-        System.out.println(tipoComponente);
-        List<Integer> idComponentes = con.queryForList("SELECT idTipoComponente FROM TipoComponente WHERE tipoComponente = ?", Integer.class, tipoComponente);
+    public Integer buscarIdTipoComponente(TipoComponente tipoComponente) {
+        List<Integer> idComponentes = con.queryForList("SELECT idTipoComponente FROM TipoComponente WHERE tipoComponente = ?", Integer.class, tipoComponente.getTipoComponente());
         return idComponentes.get(0);
     }
 
-    public Integer buscarOuCadastrarMetricaComponente(Double minMetrica, Double maxMetrica, String unidadeMedida) {
+    public Integer buscarOuCadastrarMetricaComponente(MetricaComponente metricaComponente) {
         List<Integer> metricaComponenteSel = new ArrayList<>();
-        metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, minMetrica, maxMetrica, unidadeMedida);
+        metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, metricaComponente.getMin(), metricaComponente.getMax(), metricaComponente.getUnidadeMedida());
 
         if (metricaComponenteSel.isEmpty()) {
-            con.update("INSERT INTO MetricaComponente(minMetrica, maxMetrica, unidadeMedida) VALUES (?, ?, ?)", minMetrica, maxMetrica, unidadeMedida);
-            metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, minMetrica, maxMetrica, unidadeMedida);
+            con.update("INSERT INTO MetricaComponente(minMetrica, maxMetrica, unidadeMedida) VALUES (?, ?, ?)", metricaComponente.getMin(), metricaComponente.getMax(), metricaComponente.getUnidadeMedida());
+            metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, metricaComponente.getMin(), metricaComponente.getMax(), metricaComponente.getUnidadeMedida());
         }
 
-        Integer metricaComponente = metricaComponenteSel.get(0);
-        return metricaComponente;
+        return metricaComponenteSel.get(0);
     }
 
     public Integer cadastrarComponente(Integer idMaquina, Integer valorTotal, Integer idTipoComponente, Integer idMetrica) {
@@ -98,7 +92,7 @@ public class AcessoJDBC {
         componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica);
 
         if (componenteSel.isEmpty()) {
-            con.update("INSERT INTO Componente (fkMaquina, valorTotal, fkTipoComponente, fkMetricaComponente) VALUES(?, ?, ?, ?)", idMaquina, valorTotal, idTipoComponente, idMetrica);
+            con.update("INSERT INTO Componente(fkMaquina, valorTotal, fkTipoComponente, fkMetricaComponente) VALUES(?, ?, ?, ?)", idMaquina, valorTotal, idTipoComponente, idMetrica);
             componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica);
         }
 
@@ -127,9 +121,9 @@ public class AcessoJDBC {
 
 
         String sql = "SELECT " +
-                "COUNT(*) AS quantidadeDeLogs, " +
+                "COUNT(Log.idLog) AS quantidadeDeLogs, " +
                 "TipoComponente.tipoComponente AS tipoDoComponente, " +
-                "Maquina.nomeMaquina AS nomeDaMaquina, " +
+                "Maquina.nomeMaquina AS nomeDaMaquina," +
                 "LanHouse.unidade AS unidadeDaLanHouse " +
                 "FROM Log " +
                 "JOIN Componente ON Log.fkComponente = Componente.idComponente " +
@@ -139,18 +133,12 @@ public class AcessoJDBC {
                 "WHERE LanHouse.idLanHouse = ? " +
                 "AND Maquina.idMaquina = ? " +
                 "AND Componente.fkTipoComponente = ? " +
-                "AND Log.statuslog = ? " +
+                "AND Log.statuslog = 2 " +
                 "AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 0.33 HOUR) " +
                 "GROUP BY " +
-                "TipoComponente.tipoComponente, " +
-                "Maquina.nomeMaquina, " +
-                "LanHouse.unidade " +
-                "ORDER BY " +
-                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse " +
-                "LIMIT 1;";
+                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse ";
 
-
-        RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente, idMensagem}, RetornoSelect.class);
+        RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente}, RetornoSelect.class);
 
         Integer quantidadeDeLogs = resultado.getQuantidadeDeLogs();
         String tipoDoComponente = resultado.getTipoDoComponente();
@@ -164,7 +152,7 @@ public class AcessoJDBC {
 //            mensagemAlerta = "";
 //        }
 
-//        if (quantidadeDeLogs.equals(10)) {
+        if (quantidadeDeLogs.equals(10)) {
             try {
                 String mensagem = String.format("""
                         Notamos que a máquina %s da Lan House %s está apresentando problemas de %s. Verifique o quantos antes.
@@ -177,17 +165,16 @@ public class AcessoJDBC {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        //}
+        }
     }
-
 
 
     public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu) {
 
-
         //mudar de acordo com a máquina
-        String diretorio = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios";
+        String diretorio = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
 
+        // Crie um formato de data para incorporar no nome do arquivo
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String dataFormatada = dateFormat.format(new Date());
 
@@ -213,8 +200,7 @@ public class AcessoJDBC {
                     "\nUtilização Download: " + uDown +
                     "\nUtilização Upload: " + uUp +
                     "\nUtilização GPU: " + uGpu +
-                    "\nData e hora: " + dataHoje
-                    ;
+                    "\nData e hora: " + dataHoje;
 
             buffer.write(conteudo);
             buffer.newLine();
@@ -226,7 +212,6 @@ public class AcessoJDBC {
             e.printStackTrace();
         }
     }
-
 
 
     //Para conseguir realizar o select e conseguir alocar os valores em variaves (sem usar map) usei classes DTO
@@ -256,7 +241,7 @@ public class AcessoJDBC {
         }
 
 
-}
+    }
 
     public static class RetornoParaLog {
         private String tipoDoComponente;
@@ -279,7 +264,10 @@ public class AcessoJDBC {
         public String getUnidadeDaLanHouse() {
             return unidadeDaLanHouse;
         }
-        public String getDataHora(){return dataHora;}
+
+        public String getDataHora() {
+            return dataHora;
+        }
 
     }
 }

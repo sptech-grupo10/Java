@@ -1,3 +1,7 @@
+import Classes.EspecificacoesComponente;
+import Classes.Maquina;
+import Classes.MetricaComponente;
+import Classes.TipoComponente;
 import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.discos.DiscoGrupo;
 import com.github.britooo.looca.api.group.discos.Volume;
@@ -28,7 +32,7 @@ import java.util.*;
 public class ScriptInsercao {
     static Looca looca = new Looca();
 
-    static ConexaoSQL conexao = new ConexaoSQL();
+    static Conexao conexao = new Conexao();
 
     static JdbcTemplate con = conexao.getConexaoDoBanco();
 
@@ -39,47 +43,88 @@ public class ScriptInsercao {
 
 
     public Integer cadastroMaquina(Integer idLanhouse) {
-        return acesso.cadastrarMaquina(looca.getRede().getParametros().getHostName(), idLanhouse);
+        Maquina maquina = new Maquina(looca.getRede().getParametros().getHostName(), idLanhouse);
+        return acesso.cadastrarMaquina(maquina);
     }
 
     public List<Integer> cadastrarComponentes(Integer idMaquina) {
         List<Integer> idsComponentes = new ArrayList<>();
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Processador"), acesso.buscarOuCadastrarMetricaComponente(0.0, 90.0, "%")));
-        acesso.cadastrarEspecsComponente("Numero CPU lógicas", looca.getProcessador().getNumeroCpusLogicas().toString(), idsComponentes.get(0));
-        acesso.cadastrarEspecsComponente("Modelo", looca.getProcessador().getNome(), idsComponentes.get(0));
-        acesso.cadastrarEspecsComponente("Fabricante", looca.getProcessador().getFabricante(), idsComponentes.get(0));
-        acesso.cadastrarEspecsComponente("Identificador", looca.getProcessador().getIdentificador(), idsComponentes.get(0));
 
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Ram"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%")));
-        acesso.cadastrarEspecsComponente("Capacidade máxima (GB)", looca.getMemoria().getTotal().toString(), idsComponentes.get(1));
+        TipoComponente tipoComponenteCPU = new TipoComponente("Processador");
+        MetricaComponente metricaComponenteCPU = new MetricaComponente(0.0, 90.0, "%");
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente(tipoComponenteCPU), acesso.buscarOuCadastrarMetricaComponente(metricaComponenteCPU)));
 
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Disco"), acesso.buscarOuCadastrarMetricaComponente(10.0, 90.0, "%")));
-        acesso.cadastrarEspecsComponente("Modelo", looca.getGrupoDeDiscos().getDiscos().get(0).getModelo(), idsComponentes.get(2));
-        acesso.cadastrarEspecsComponente("UUID", looca.getGrupoDeDiscos().getVolumes().get(0).getUUID(), idsComponentes.get(2));
-        acesso.cadastrarEspecsComponente("Tipo de disco", looca.getGrupoDeDiscos().getVolumes().get(0).getTipo(), idsComponentes.get(2));
-        acesso.cadastrarEspecsComponente("Unidade", looca.getGrupoDeDiscos().getVolumes().get(0).getPontoDeMontagem(), idsComponentes.get(2));
+        EspecificacoesComponente especificacaoCPU1 = new EspecificacoesComponente("Numero CPU lógicas", looca.getProcessador().getNumeroCpusLogicas().toString(), idsComponentes.get(0));
+        EspecificacoesComponente especificacaoCPU2 = new EspecificacoesComponente("Modelo", looca.getProcessador().getNome(), idsComponentes.get(0));
+        EspecificacoesComponente especificacaoCPU3 = new EspecificacoesComponente("Fabricante", looca.getProcessador().getFabricante(), idsComponentes.get(0));
+        EspecificacoesComponente especificacaoCPU4 = new EspecificacoesComponente("Identificador", looca.getProcessador().getIdentificador(), idsComponentes.get(0));
+
+        acesso.cadastrarEspecsComponente(especificacaoCPU1);
+        acesso.cadastrarEspecsComponente(especificacaoCPU2);
+        acesso.cadastrarEspecsComponente(especificacaoCPU3);
+        acesso.cadastrarEspecsComponente(especificacaoCPU4);
+
+        System.out.println("CPU localizada: " + especificacaoCPU2.getValor());
+
+        TipoComponente tipoComponenteRAM = new TipoComponente("Ram");
+        MetricaComponente metricaComponenteRAM = new MetricaComponente(0.0, 90.0, "%");
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente(tipoComponenteRAM), acesso.buscarOuCadastrarMetricaComponente(metricaComponenteRAM)));
+
+        EspecificacoesComponente especificacaoRAM1 = new EspecificacoesComponente("Capacidade máxima", looca.getMemoria().getTotal().toString(), idsComponentes.get(1));
+        acesso.cadastrarEspecsComponente(especificacaoRAM1);
+
+        System.out.println("RAM de capacidade máxima: " + especificacaoRAM1.getValor() + " localizada");
+
+        TipoComponente tipoComponenteDisco = new TipoComponente("Disco");
+        MetricaComponente metricaComponenteDisco = new MetricaComponente(10.0, 90.0, "%");
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente(tipoComponenteDisco), acesso.buscarOuCadastrarMetricaComponente(metricaComponenteDisco)));
+
+        EspecificacoesComponente especificacaoDisco1 = new EspecificacoesComponente("Modelo", looca.getGrupoDeDiscos().getDiscos().get(0).getModelo(), idsComponentes.get(2));
+        EspecificacoesComponente especificacaoDisco2 = new EspecificacoesComponente("UUID", looca.getGrupoDeDiscos().getVolumes().get(0).getUUID(), idsComponentes.get(2));
+        EspecificacoesComponente especificacaoDisco3 = new EspecificacoesComponente("Tipo de disco", looca.getGrupoDeDiscos().getVolumes().get(0).getTipo(), idsComponentes.get(2));
+        EspecificacoesComponente especificacaoDisco4 = new EspecificacoesComponente("Unidade", looca.getGrupoDeDiscos().getVolumes().get(0).getPontoDeMontagem(), idsComponentes.get(2));
+        acesso.cadastrarEspecsComponente(especificacaoDisco1);
+        acesso.cadastrarEspecsComponente(especificacaoDisco2);
+        acesso.cadastrarEspecsComponente(especificacaoDisco3);
+        acesso.cadastrarEspecsComponente(especificacaoDisco4);
+
+        System.out.println("Disco localizado: " + especificacaoDisco1.getValor());
 
         for (RedeInterface rede : looca.getRede().getGrupoDeInterfaces().getInterfaces()) {
             if (!rede.getEnderecoIpv4().isEmpty()) {
-                idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("Rede"), acesso.buscarOuCadastrarMetricaComponente(40.0, 90.0, "%")));
-                acesso.cadastrarEspecsComponente("Endereço IPv4", rede.getEnderecoIpv4().get(0), idsComponentes.get(3));
-                acesso.cadastrarEspecsComponente("Endereço IPv6", rede.getEnderecoIpv6().get(0), idsComponentes.get(3));
-                acesso.cadastrarEspecsComponente("Nome da rede", rede.getNome(), idsComponentes.get(3));
-                acesso.cadastrarEspecsComponente("Nome de exibição", rede.getNomeExibicao(), idsComponentes.get(3));
+                TipoComponente tipoComponenteRede = new TipoComponente("Rede");
+                MetricaComponente metricaComponenteRede = new MetricaComponente(40.0, 90.0, "%");
+                idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente(tipoComponenteRede), acesso.buscarOuCadastrarMetricaComponente(metricaComponenteRede)));
+
+                EspecificacoesComponente especificacaoRede1 = new EspecificacoesComponente("Endereço IPv4", rede.getEnderecoIpv4().get(0), idsComponentes.get(3));
+                EspecificacoesComponente especificacaoRede2 = new EspecificacoesComponente("Endereço IPv6", rede.getEnderecoIpv6().get(0), idsComponentes.get(3));
+                EspecificacoesComponente especificacaoRede3 = new EspecificacoesComponente("Nome da rede", rede.getNome(), idsComponentes.get(3));
+                EspecificacoesComponente especificacaoRede4 = new EspecificacoesComponente("Nome de exibição", rede.getNomeExibicao(), idsComponentes.get(3));
+                acesso.cadastrarEspecsComponente(especificacaoRede1);
+                acesso.cadastrarEspecsComponente(especificacaoRede2);
+                acesso.cadastrarEspecsComponente(especificacaoRede3);
+                acesso.cadastrarEspecsComponente(especificacaoRede4);
+
+                System.out.println("Rede localizada: " + especificacaoRede3.getValor());
                 break;
             }
         }
 
-        //cadastrando gpu - inovacao
+        TipoComponente tipoComponenteGPU = new TipoComponente("GPU");
+        MetricaComponente metricaComponenteGPU = new MetricaComponente(0.0, 95.0, "%");
+        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente(tipoComponenteGPU), acesso.buscarOuCadastrarMetricaComponente(metricaComponenteGPU)));
 
-        idsComponentes.add(acesso.cadastrarComponente(idMaquina, 1, acesso.buscarIdTipoComponente("GPU"), acesso.buscarOuCadastrarMetricaComponente(0.0, 95.0, "%")));
-        acesso.cadastrarEspecsComponente("Nome da placa Gráfica", hardware.getGraphicsCards().get(0).getName(), idsComponentes.get(4));
-        acesso.cadastrarEspecsComponente("Marca placa gráfica", hardware.getGraphicsCards().get(0).getVendor(), idsComponentes.get(4));
-        acesso.cadastrarEspecsComponente("Versão do driver", hardware.getGraphicsCards().get(0).getVersionInfo(), idsComponentes.get(4));
+        EspecificacoesComponente especificacaoGPU1 = new EspecificacoesComponente("Nome da placa Gráfica", hardware.getGraphicsCards().get(0).getName(), idsComponentes.get(4));
+        EspecificacoesComponente especificacaoGPU2 = new EspecificacoesComponente("Marca placa gráfica", hardware.getGraphicsCards().get(0).getVendor(), idsComponentes.get(4));
+        EspecificacoesComponente especificacaoGPU3 = new EspecificacoesComponente("Versão do driver", hardware.getGraphicsCards().get(0).getVersionInfo(), idsComponentes.get(4));
+        acesso.cadastrarEspecsComponente(especificacaoGPU1);
+        acesso.cadastrarEspecsComponente(especificacaoGPU2);
+        acesso.cadastrarEspecsComponente(especificacaoGPU3);
+
+        System.out.println("Placa gráfica localizada: " + especificacaoGPU1.getValor());
 
         return idsComponentes;
     }
-
 
     public void inserirDados(Integer idProcessador, Integer idRam, Integer idDisco, Integer idRede, Integer idGpu, Integer idMaquina, Integer idLanHouse) {
         Timer timer = new Timer();
@@ -147,108 +192,61 @@ public class ScriptInsercao {
 
                 // GPU - Inovação
                 Double bytesGpu = Double.valueOf(hardware.getGraphicsCards().get(0).getVRam());
-                Double totalGpu = 5981045182.00;
-                Double porcGpu = (bytesGpu/totalGpu) * 100;
+                Double totalGpu = 5981045185.00;
+                Double porcGpu = (bytesGpu / totalGpu) * 100;
 
-
-
-
-
-
-                Boolean enviarAlerta = false;
-
-                //Processador
 
                 if (utilizacaoProcessador < metricaProcessador.get(0) || utilizacaoProcessador > metricaProcessador.get(1)) {
                     textLog = "Processador sobrecarregado";
                     statusLog = 3;
-                    enviarAlerta = true;
-                }
-                else if (utilizacaoProcessador < (metricaProcessador.get(0) * 0.85) ||
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 2, 3);
+                } else if (utilizacaoProcessador < (metricaProcessador.get(0) * 0.85) ||
                         utilizacaoProcessador > (metricaProcessador.get(1) * 0.85)) {
                     textLog = "Processador quase sobrecarregado";
                     statusLog = 2;
-                    enviarAlerta = true;
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 2, 2);
 //                    acesso.construirLog(idMaquina, utilizacaoProcessador, );
-                }
-                else {
+                } else {
                     textLog = "Processador em uso normal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, utilizacaoProcessador, dataHora, statusLog, idProcessador);
-
-                if (enviarAlerta && statusLog.equals(2)){
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 2);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                } else if (enviarAlerta && statusLog.equals(3)) {
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                }
-
                 System.out.printf("\n\nUtilização do processador: %d%%", utilizacaoProcessador.shortValue());
-                enviarAlerta = false;
-
 
                 // Memória RAM
 
                 if (porcMemoria < metricaRam.get(0) || porcMemoria > metricaRam.get(1)) {
                     textLog = "Memória RAM sobrecarregado";
-                    statusLog = 3;
-                    enviarAlerta = true;
-                }
-                else if (porcMemoria < (metricaRam.get(0) * 0.85) || porcMemoria > (metricaRam.get(1) * 0.85)) {
+                    statusLog = 1;
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 1, 3);
+                } else if (porcMemoria < (metricaRam.get(0) * 0.85) || porcMemoria > (metricaRam.get(1) * 0.85)) {
                     textLog = "Memória RAM quase sobrecarregado";
                     statusLog = 2;
-                    enviarAlerta = true;
-                }
-                else {
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 1, 2);
+                } else {
                     textLog = "Memória RAM em uso normal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, porcMemoria, dataHora, statusLog, idRam);
-
-                if (enviarAlerta && statusLog.equals(2)){
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 2);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                } else if (enviarAlerta && statusLog.equals(3)) {
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                }
-
                 System.out.printf("\nUtilização da memória RAM: %d%%", porcMemoria.shortValue());
-                enviarAlerta = false;
-
 
                 // Disco
 
                 if (porcentagemDiscoOcupado < metricaDisco.get(0) || porcentagemDiscoOcupado > metricaDisco.get(1)) {
                     textLog = "Disco sobrecarregado";
                     statusLog = 3;
-                    enviarAlerta = true;
-                }
-                else if (porcentagemDiscoOcupado < (metricaDisco.get(0) * 0.85)
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 3, 3);
+                } else if (porcentagemDiscoOcupado < (metricaDisco.get(0) * 0.85)
                         || porcentagemDiscoOcupado > (metricaDisco.get(1) * 0.85)) {
                     textLog = "Disco quase sobrecarregado";
                     statusLog = 2;
-                    enviarAlerta = true;
-                }
-                else {
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 3, 2);
+                } else {
                     textLog = "Disco em uso normal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, porcentagemDiscoOcupado, dataHora, statusLog, idDisco);
-
-                if (enviarAlerta && statusLog.equals(2)){
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 3, 2);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                } else if (enviarAlerta && statusLog.equals(3)) {
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 3, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                }
-
                 System.out.printf("\nUtilização de Disco: %d%%", porcentagemDiscoOcupado.shortValue());
-                enviarAlerta = false;
-
 
 
                 //Rede - Download
@@ -256,87 +254,49 @@ public class ScriptInsercao {
                 if (porcentagemVelocidadeDowload < metricaRede.get(0)) {
                     textLog = "Download fora do ideal";
                     statusLog = 2;
-                    enviarAlerta = true;
-                }
-                else if (porcentagemVelocidadeDowload < (metricaRede.get(0) * 0.85)) {
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                } else if (porcentagemVelocidadeDowload < (metricaRede.get(0) * 0.85)) {
                     textLog = "Download quase fora do ideal";
                     statusLog = 2;
-                    enviarAlerta = true;
-                }
-                else {
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                } else {
                     textLog = "Download ideal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeDownload, dataHora, statusLog, idRede);
-
-                if (enviarAlerta && statusLog.equals(2)){
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                } else if (enviarAlerta && statusLog.equals(3)) {
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                }
-
                 System.out.println("\nVelocidade de download:" + Conversor.formatarBytes(velocidadeDownload.longValue()));
-                enviarAlerta = false;
-
 
                 //Rede - Upload
 
                 if (porcentagemVelocidadeUpload < metricaRede.get(0)) {
                     textLog = "Upload fora do ideal";
                     statusLog = 3;
-                    enviarAlerta = true;
-                }
-                else if (porcentagemVelocidadeDowload < (metricaRede.get(0) * 0.85)) {
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
+                } else if (porcentagemVelocidadeDowload < (metricaRede.get(0) * 0.85)) {
                     textLog = "Upload quase fora do ideal";
                     statusLog = 2;
-                    enviarAlerta = true;
-                }
-                else {
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
+                } else {
                     textLog = "Upload ideal";
                     statusLog = 1;
                 }
                 acesso.insercaoDados(textLog, velocidadeUpload, dataHora, statusLog, idRede);
-
-                if (enviarAlerta && statusLog.equals(2)){
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                } else if (enviarAlerta && statusLog.equals(3)) {
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                }
-
                 System.out.println("Velocidade de upload: " + Conversor.formatarBytes(velocidadeUpload.longValue()));
-                enviarAlerta = false;
 
-
-                if (porcGpu < metricaGpu.get(0)){
+                if (porcGpu < metricaGpu.get(0)) {
                     textLog = "Placa gráfica sobrecarregando";
                     statusLog = 3;
-                    enviarAlerta = true;
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 5, 3);
                 } else if (porcGpu < (metricaGpu.get(0) * 0.85)) {
                     textLog = "Placa gráfica quase sobrecarregando";
                     statusLog = 2;
-                    enviarAlerta = true;
+                    //acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);
                 } else {
                     textLog = "Placa gráfica ideal";
                     statusLog = 1;
-
                 }
                 acesso.insercaoDados(textLog, porcGpu, dataHora, statusLog, idGpu);
-                System.out.println(bytesGpu);
-//
-                if (enviarAlerta && statusLog.equals(2)){
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                } else if (enviarAlerta && statusLog.equals(3)) {
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 5, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu);
-                }
-
-                System.out.println("Utilização placa gráfica: " + Conversor.formatarBytes(bytesGpu.longValue()));
-//                enviarAlerta = false;
+                System.out.println("Utilização placa gráfica: " + porcGpu + "%");
             }
         }, 0, 1000);
     }

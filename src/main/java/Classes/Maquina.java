@@ -1,10 +1,14 @@
 package Classes;
 
 public class Maquina {
-    Integer idMaquina;
-    String nomeMaquina;
-    Integer fkLanHouse;
+    private Integer idMaquina;
+    private String nomeMaquina;
+    private Integer fkLanHouse;
 
+    public Maquina(String nomeMaquina, Integer fkLanHouse) {
+        this.nomeMaquina = nomeMaquina;
+        this.fkLanHouse = fkLanHouse;
+    }
 
     public Integer getIdMaquina() {
         return idMaquina;

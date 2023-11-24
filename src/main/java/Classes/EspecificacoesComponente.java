@@ -1,12 +1,17 @@
 package Classes;
 
 public class EspecificacoesComponente {
-    Integer idEspecificacoesComponente;
-    String especificacao;
-    String valor;
-    Integer fkComponente;
-    Integer fkTipoComponente;
+    private Integer idEspecificacoesComponente;
+    private String especificacao;
+    private String valor;
+    private Integer fkComponente;
+    private Integer fkTipoComponente;
 
+    public EspecificacoesComponente(String especificacao, String valor, Integer fkComponente) {
+        this.especificacao = especificacao;
+        this.valor = valor;
+        this.fkComponente = fkComponente;
+    }
 
     public Integer getIdEspecificacoesComponente() {
         return idEspecificacoesComponente;

@@ -1,11 +1,14 @@
 package Classes;
 
 public class Maquina {
-    Integer idMaquina;
-    String nomeMaquina;
-    Integer fkSala;
-    Integer fkLanHouse;
+    private Integer idMaquina;
+    private String nomeMaquina;
+    private Integer fkLanHouse;
 
+    public Maquina(String nomeMaquina, Integer fkLanHouse) {
+        this.nomeMaquina = nomeMaquina;
+        this.fkLanHouse = fkLanHouse;
+    }
 
     public Integer getIdMaquina() {
         return idMaquina;
@@ -23,14 +26,6 @@ public class Maquina {
         this.nomeMaquina = nomeMaquina;
     }
 
-    public Integer getFkSala() {
-        return fkSala;
-    }
-
-    public void setFkSala(Integer fkSala) {
-        this.fkSala = fkSala;
-    }
-
     public Integer getFkLanHouse() {
         return fkLanHouse;
     }
@@ -46,7 +41,6 @@ public class Maquina {
         return "\nMaquina{" +
                 "id maquina=" + idMaquina +
                 ", nome de maquina=" + nomeMaquina +
-                ", sala=" + fkSala +
                 ", Lan House=" + fkLanHouse +
                 '}';
     }

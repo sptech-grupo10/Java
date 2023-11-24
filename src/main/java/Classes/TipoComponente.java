@@ -2,8 +2,11 @@ package Classes;
 
 public class TipoComponente {
     private Integer idTipoComponente;
-    private String tipoComponentecol;
+    private String tipoComponente;
 
+    public TipoComponente(String tipoComponente) {
+        this.tipoComponente = tipoComponente;
+    }
 
     public Integer getIdTipoComponente() {
         return idTipoComponente;
@@ -13,12 +16,12 @@ public class TipoComponente {
         this.idTipoComponente = idTipoComponente;
     }
 
-    public String getTipoComponentecol() {
-        return tipoComponentecol;
+    public String getTipoComponente() {
+        return tipoComponente;
     }
 
-    public void setTipoComponentecol(String tipoComponentecol) {
-        this.tipoComponentecol = tipoComponentecol;
+    public void setTipoComponente(String tipoComponentecol) {
+        this.tipoComponente = tipoComponente;
     }
 
 
@@ -28,7 +31,7 @@ public class TipoComponente {
     public String toString() {
         return "\nTipo de Componente{" +
                 "id Tipo de Componente=" + idTipoComponente +
-                ", Tipo de Componente=" + tipoComponentecol+
+                ", Tipo de Componente=" + tipoComponente+
                 '}';
     }
 

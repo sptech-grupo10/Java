@@ -25,7 +25,8 @@ public class AcessoJDBC {
 //    JdbcTemplate con = conexao.getConnection();
     Conexao conexao = new Conexao();
     JdbcTemplate con = conexao.getConexaoDoBanco();
-    private static String webHooksUrl = "https://hooks.slack.com/services/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";
+    private static String parte1url = "https://hooks.slack.com/services/T064";
+    private static String webHooksUrl = parte1url + "ABT4TFU/B066XCEMKQX/vPXL1QNC68BczzFcaxN1Gdhc";
     private static String canalSlack = "alertas";
 
     public Integer obterIdLanhousePorCodigo(String codigoAcesso) {

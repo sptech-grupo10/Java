@@ -21,10 +21,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AcessoJDBC {
-    ConexaoSQL conexao = new ConexaoSQL();
-    JdbcTemplate con = conexao.getConnection();
-    private static String webHooksUrl = "https://hooks.slack.com/services/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";
-    private static String oAuthToken = "xoxb-6146401163538-6147415712946-6fi0np5JSHztzuFkq5ZI8AFf";
+    //    ConexaoSQL conexao = new ConexaoSQL();
+//    JdbcTemplate con = conexao.getConnection();
+    Conexao conexao = new Conexao();
+    JdbcTemplate con = conexao.getConexaoDoBanco();
+    private static String webHooksUrl = "https://hooks.slack.com/services/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";
     private static String canalSlack = "alertas";
 
     public Integer obterIdLanhousePorCodigo(String codigoAcesso) {
@@ -118,52 +119,140 @@ public class AcessoJDBC {
     }
 
     public void enviarAlerta(Integer idMaquina, Integer idLanHouse, Integer fkComponente, Integer idMensagem) {
+        //System.out.println("entrou no enviar");
+        String sql =
+                "SELECT " +
+                        "COUNT(*) AS quantidadeDeLogs " +
+                        "FROM Log " +
+                        "JOIN Componente ON Log.fkComponente = Componente.idComponente " +
+                        "JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente " +
+                        "JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina " +
+                        "JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse " +
+                        "WHERE LanHouse.idLanHouse = ? " +
+                        "AND Maquina.idMaquina = ? " +
+                        "AND Componente.fkTipoComponente = ? " +
+                        "AND Log.statuslog = ? " +
+                        //"AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND) " +
+                        "GROUP BY " +
+                        "tipoComponente.tipoComponente, " +
+                        "Maquina.nomeMaquina, " +
+                        "LanHouse.unidade "
+                //"Log.dataLog " +
+                //"ORDER BY " +
+                //"Log.dataLog DESC " +
+                //"LIMIT 1 "
+                ;
+
+        List<Integer> qtdRegistros = con.queryForList(sql, Integer.class, idLanHouse, idMaquina, fkComponente
+                , idMensagem
+        );
+        if (!qtdRegistros.isEmpty()) {
+        //    System.out.println("viu se é senfjnefe");
+            if (qtdRegistros.get(0).equals(10)) {
 
 
-        String sql = "SELECT " +
-                "COUNT(Log.idLog) AS quantidadeDeLogs, " +
-                "TipoComponente.tipoComponente AS tipoDoComponente, " +
-                "Maquina.nomeMaquina AS nomeDaMaquina," +
-                "LanHouse.unidade AS unidadeDaLanHouse " +
-                "FROM Log " +
-                "JOIN Componente ON Log.fkComponente = Componente.idComponente " +
-                "JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente " +
-                "JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina " +
-                "JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse " +
-                "WHERE LanHouse.idLanHouse = ? " +
-                "AND Maquina.idMaquina = ? " +
-                "AND Componente.fkTipoComponente = ? " +
-                "AND Log.statuslog = 2 " +
-                "AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 0.33 HOUR) " +
-                "GROUP BY " +
-                "tipoDoComponente, nomeDaMaquina, unidadeDaLanHouse ";
+                String sqlTipoComponente = """
+                            SELECT
+                                TipoComponente.tipoComponente AS tipoDoComponente
+                            FROM
+                                Log
+                            JOIN
+                                Componente ON Log.fkComponente = Componente.idComponente
+                            JOIN
+                                TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente
+                            JOIN
+                                Maquina ON Componente.fkMaquina = Maquina.idMaquina
+                            JOIN
+                                LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse
+                            WHERE
+                                LanHouse.idLanHouse = ?
+                                AND Maquina.idMaquina = ?
+                                AND Componente.fkTipoComponente = ?
+                                AND Log.statuslog = ?
+                                AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND)
+                            ORDER BY
+                                Log.dataLog DESC
+                            LIMIT 1;
+                        """;
 
-        RetornoSelect resultado = con.queryForObject(sql, new Object[]{idLanHouse, idMaquina, fkComponente}, RetornoSelect.class);
 
-        Integer quantidadeDeLogs = resultado.getQuantidadeDeLogs();
-        String tipoDoComponente = resultado.getTipoDoComponente();
-        String nomeDaMaquina = resultado.getNomeDaMaquina();
-        String unidadeDaLanHouse = resultado.getUnidadeDaLanHouse();
+                List<String> infoTipoComponente = con.queryForList(sqlTipoComponente, String.class,
+                        idLanHouse, idMaquina, fkComponente
+                        , idMensagem
+                );
 
-//        String mensagemAlerta = "";
-//        if (idMensagem.equals(2)){
-//            mensagemAlerta = "quase";
-//        } else if (idMensagem.equals(3)) {
-//            mensagemAlerta = "";
-//        }
 
-        if (quantidadeDeLogs.equals(10)) {
-            try {
-                String mensagem = String.format("""
-                        Notamos que a máquina %s da Lan House %s está apresentando problemas de %s. Verifique o quantos antes.
-                        """, nomeDaMaquina, unidadeDaLanHouse, tipoDoComponente);
-                StringBuilder msgBuilder = new StringBuilder();
-                msgBuilder.append(mensagem);
+                String sqlNomeMaquina = """
+                            SELECT
+                                Maquina.nomeMaquina AS nomeDaMaquina
+                            FROM
+                                Log
+                            JOIN
+                                Componente ON Log.fkComponente = Componente.idComponente
+                            JOIN
+                                TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente
+                            JOIN
+                                Maquina ON Componente.fkMaquina = Maquina.idMaquina
+                            JOIN
+                                LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse
+                            WHERE
+                                LanHouse.idLanHouse = ?
+                                AND Maquina.idMaquina = ?
+                                AND Componente.fkTipoComponente = ?
+                                AND Log.statuslog = ?
+                                AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND)
+                            ORDER BY
+                                Log.dataLog DESC
+                            LIMIT 1;
+                        """;
 
-                Payload payload = Payload.builder().channel(canalSlack).text(msgBuilder.toString()).build();
-                WebhookResponse wbResp = Slack.getInstance().send(webHooksUrl, payload);
-            } catch (Exception e) {
-                e.printStackTrace();
+                List<String> infoNomeMaquina = con.queryForList(sqlNomeMaquina, String.class,
+                        idLanHouse, idMaquina, fkComponente
+                        , idMensagem
+                );
+
+                String sqlUnidadeLanHouse = """
+                            SELECT
+                                LanHouse.unidade AS unidadeDaLanHouse
+                            FROM
+                                Log
+                            JOIN
+                                Componente ON Log.fkComponente = Componente.idComponente
+                            JOIN
+                                TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente
+                            JOIN
+                                Maquina ON Componente.fkMaquina = Maquina.idMaquina
+                            JOIN
+                                LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse
+                            WHERE
+                                LanHouse.idLanHouse = ?
+                                AND Maquina.idMaquina = ?
+                                AND Componente.fkTipoComponente = ?
+                                AND Log.statuslog = ?
+                                AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND)
+                            ORDER BY
+                                Log.dataLog DESC
+                            LIMIT 1;
+                        """;
+
+                List<String> infoUnidade = con.queryForList(sqlUnidadeLanHouse, String.class,
+                        idLanHouse, idMaquina, fkComponente
+                        , idMensagem
+                );
+
+                try {
+                    String mensagem = String.format("""
+                            Notamos que a máquina %s da Lan House %s está apresentando problemas de %s. Verifique o quantos antes.
+                            """, infoNomeMaquina.get(0), infoUnidade.get(0), infoTipoComponente.get(0));
+                    StringBuilder msgBuilder = new StringBuilder();
+                    msgBuilder.append(mensagem);
+
+                    Payload payload = Payload.builder().channel(canalSlack).text(msgBuilder.toString()).build();
+                    WebhookResponse wbResp = Slack.getInstance().send(webHooksUrl, payload);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //System.out.println("fez tudo");
             }
         }
     }
@@ -171,27 +260,20 @@ public class AcessoJDBC {
 
     public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu) {
 
+        String caminhoArquivo = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
+
         //mudar de acordo com a máquina
-        String diretorio = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
-
-        // Crie um formato de data para incorporar no nome do arquivo
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String dataFormatada = dateFormat.format(new Date());
-
-        String nomeArquivo = "log_" + dataFormatada + ".txt";
-        String caminhoCompleto = diretorio + "\\" + nomeArquivo;
-
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String dataHoje = LocalDateTime.now().format(dtf);
 
         try {
-            File hist = new File(caminhoCompleto);
+            File hist = new File(caminhoArquivo);
 
             if (!hist.exists()) {
                 hist.createNewFile();
             }
 
-            BufferedWriter buffer = new BufferedWriter(new FileWriter(caminhoCompleto, true));
+            BufferedWriter buffer = new BufferedWriter(new FileWriter(caminhoArquivo, true));
 
             String conteudo = "Id Maquina: " + idMaquina +
                     "\nUtilização RAM: " + uRam +
@@ -206,7 +288,7 @@ public class AcessoJDBC {
             buffer.newLine();
             buffer.close();
 
-            System.out.println("Verifique seu log armazenado em: " + caminhoCompleto);
+            System.out.println("Verifique seu log armazenado em: " + caminhoArquivo);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -30,15 +30,16 @@ public class Jar {
         }
 
         String nomeUsuario = acesso.buscarUsuario(email, senha);
-        System.out.println("=================== Bem vindo(a) " + nomeUsuario + " ==================\n");
-
-        System.out.println("===================================================================");
-        System.out.println("|                       Escolha uma opção:                        |");
-        System.out.println("|=================================================================|");
-        System.out.println("|1- Cadastrar/Localizar componentes e começar a busca de dados    |");
-        System.out.println("|2- Mudar de conta                                                |");
-        System.out.println("|3- Sair                                                          |");
-        System.out.println("===================================================================");
+        System.out.println(String.format("""
+                =================== Bem vindo(a) " %s " ==================
+                ===================================================================
+                |                       Escolha uma opção:                        |
+                |=================================================================|
+                |1- Cadastrar/Localizar componentes e começar a busca de dados    |
+                |2- Mudar de conta                                                |
+                |3- Sair                                                          |
+                ===================================================================
+                """, nomeUsuario));
 
         switch (inInt.nextInt()) {
             case 1:

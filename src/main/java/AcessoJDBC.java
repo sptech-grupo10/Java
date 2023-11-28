@@ -21,10 +21,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AcessoJDBC {
-    //    ConexaoSQL conexao = new ConexaoSQL();
-//    JdbcTemplate con = conexao.getConnection();
-    Conexao conexao = new Conexao();
-    JdbcTemplate con = conexao.getConexaoDoBanco();
+    ConexaoSQL conexao = new ConexaoSQL();
+    JdbcTemplate con = conexao.getConnection();
+    
+    Conexao conexaoMysql = new Conexao();
+    JdbcTemplate conMysql = conexaoMysql.getConexaoDoBanco();
     private static String parte1url = "https://hooks.slack.com/services/T064";
     private static String webHooksUrl = parte1url + "ABT4TFU/B066XCEMKQX/vPXL1QNC68BczzFcaxN1Gdhc";
     private static String canalSlack = "alertas";

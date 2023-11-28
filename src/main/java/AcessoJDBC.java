@@ -134,7 +134,7 @@ public class AcessoJDBC {
                         "AND Maquina.idMaquina = ? " +
                         "AND Componente.fkTipoComponente = ? " +
                         "AND Log.statuslog = ? " +
-                        //"AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND) " +
+                        "AND Log.dataLog >= DATE_SUB(GETDATE(), INTERVAL 1980 SECOND) " +
                         "GROUP BY " +
                         "tipoComponente.tipoComponente, " +
                         "Maquina.nomeMaquina, " +
@@ -171,7 +171,7 @@ public class AcessoJDBC {
                                 AND Maquina.idMaquina = ?
                                 AND Componente.fkTipoComponente = ?
                                 AND Log.statuslog = ?
-                                AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND)
+                                AND Log.dataLog >= DATE_SUB(GETDATE(), INTERVAL 1980 SECOND)
                             ORDER BY
                                 Log.dataLog DESC
                             LIMIT 1;
@@ -202,7 +202,7 @@ public class AcessoJDBC {
                                 AND Maquina.idMaquina = ?
                                 AND Componente.fkTipoComponente = ?
                                 AND Log.statuslog = ?
-                                AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND)
+                                AND Log.dataLog >= DATE_SUB(GETDATE(), INTERVAL 1980 SECOND)
                             ORDER BY
                                 Log.dataLog DESC
                             LIMIT 1;
@@ -231,7 +231,7 @@ public class AcessoJDBC {
                                 AND Maquina.idMaquina = ?
                                 AND Componente.fkTipoComponente = ?
                                 AND Log.statuslog = ?
-                                AND Log.dataLog >= DATE_SUB(NOW(), INTERVAL 1980 SECOND)
+                                AND Log.dataLog >= DATE_SUB(GETDATE(), INTERVAL 1980 SECOND)
                             ORDER BY
                                 Log.dataLog DESC
                             LIMIT 1;

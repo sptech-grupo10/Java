@@ -1,11 +1,20 @@
 package Classes;
 
-public class Componente {
+public class Componente extends TipoComponente {
     private Integer idComponente;
     private String nomeComponente;
     private Integer fkMaquina;
     private Integer fkTipoComponente;
     private Integer fkMetrica;
+
+    public Componente(String tipoComponente, Integer idComponente, String nomeComponente, Integer fkMaquina, Integer fkTipoComponente, Integer fkMetrica) {
+        super(tipoComponente);
+        this.idComponente = idComponente;
+        this.nomeComponente = nomeComponente;
+        this.fkMaquina = fkMaquina;
+        this.fkTipoComponente = fkTipoComponente;
+        this.fkMetrica = fkMetrica;
+    }
 
     public Integer getIdComponente(){
         return idComponente;

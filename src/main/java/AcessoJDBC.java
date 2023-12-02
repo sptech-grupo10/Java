@@ -262,7 +262,7 @@ public class AcessoJDBC {
 
     public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu) {
 
-        String caminhoArquivo = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
+        String caminhoArquivo = "C:";
 
         //mudar de acordo com a máquina
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

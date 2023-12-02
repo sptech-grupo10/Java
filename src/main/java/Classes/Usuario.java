@@ -1,6 +1,6 @@
 package Classes;
 
-public class Usuario {
+public class Usuario extends TipoUsuario {
     private Integer idUsuario;
     private String nome;
     private String sobrenome;
@@ -11,6 +11,17 @@ public class Usuario {
     private Integer fkEmpresa;
     private Integer fkTipoUsuario;
 
+    public Usuario(Integer idUsuario, String nome, String sobrenome, String situacao, String email, String senha, Integer fkLanHouse, Integer fkEmpresa, Integer fkTipoUsuario) {
+        this.idUsuario = idUsuario;
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.situacao = situacao;
+        this.email = email;
+        this.senha = senha;
+        this.fkLanHouse = fkLanHouse;
+        this.fkEmpresa = fkEmpresa;
+        this.fkTipoUsuario = fkTipoUsuario;
+    }
 
     public Integer getIdUsuario() {
         return idUsuario;

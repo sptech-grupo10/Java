@@ -1,12 +1,19 @@
 package Classes;
 
-public class Representante {
+public class Representante extends TipoUsuario {
     private Integer idRepresentante;
     private String nome;
     private String telefone;
     private String email;
     private Integer cpf;
 
+    public Representante(Integer idRepresentante, String nome, String telefone, String email, Integer cpf) {
+        this.idRepresentante = idRepresentante;
+        this.nome = nome;
+        this.telefone = telefone;
+        this.email = email;
+        this.cpf = cpf;
+    }
 
     public Integer getIdRepresentante() {
         return idRepresentante;

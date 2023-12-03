@@ -11,13 +11,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class AcessoJDBC {
@@ -25,7 +28,7 @@ public class AcessoJDBC {
     JdbcTemplate con = conexao.getConnection();
     
     Conexao conexaoMysql = new Conexao();
-    JdbcTemplate conMysql = conexaoMysql.getConexaoDoBanco();
+    JdbcTemplate conexaoMysqlConexaoDoBanco = conexaoMysql.getConexaoDoBanco();
     private static String parte1url = "https://hooks.slack.com/services/T064";
     private static String webHooksUrl = parte1url + "ABT4TFU/B066XCEMKQX/vPXL1QNC68BczzFcaxN1Gdhc";
     private static String canalSlack = "alertas";
@@ -260,98 +263,110 @@ public class AcessoJDBC {
     }
 
 
-    public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu) {
+    public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu, Integer idComponente) {
 
-        String caminhoArquivo = "C:";
+        String caminhoArquivo = System.getProperty("java.io.tmpdir") + "/";
+       // String caminhoArquivo = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
+
 
         //mudar de acordo com a máquina
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
         String dataHoje = LocalDateTime.now().format(dtf);
+        String caminho = caminhoArquivo + dataHoje + "_log.txt";
+        System.out.println(caminho);
+        String componente = "";
 
-        try {
-            File hist = new File(caminhoArquivo);
+        if (Files.exists(Path.of(caminho))) {
+            try {
+                BufferedWriter buffer = new BufferedWriter(new FileWriter(caminho, true));
+                System.out.println("foi?");
+                if (idComponente.equals(1)){
+                    componente = "CPU";
+                } else if (idComponente.equals(2)) {
+                    componente = "RAM";
+                } else if (idComponente.equals(3)) {
+                    componente = "Disco";
+                } else if (idComponente.equals(4)) {
+                    componente = "Rede";
+                } else if (idComponente.equals(5)) {
+                    componente = "GPU";
+                }
 
-            if (!hist.exists()) {
-                hist.createNewFile();
+                List<String> nomeMaquina = con.queryForList("SELECT nomeMaquina FROM maquina WHERE idMaquina = ?", String.class, idMaquina);
+
+                String conteudo = "A Máquina " + nomeMaquina.get(0) + " precisa de atenção em " + componente + "." +
+                        "\nId Maquina: " + idMaquina +
+                        "\nUtilização RAM: " + uRam +
+                        "\nUtilização CPU: " + uProcessador +
+                        "\nUtilização Disco: " + uDisco +
+                        "\nUtilização Download: " + uDown +
+                        "\nUtilização Upload: " + uUp +
+                        "\nUtilização GPU: " + uGpu +
+                        "\nData e hora: " + dataHoje;
+
+                System.out.println(conteudo);
+                buffer.write(conteudo);
+                System.out.println("escreveu?");
+                buffer.newLine();
+                buffer.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        } else {
+            boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
 
-            BufferedWriter buffer = new BufferedWriter(new FileWriter(caminhoArquivo, true));
+            try {
+                if (isWindows) {
+                    // Se for Windows, cria o arquivo sem definir permissões
+                    Files.createFile(Path.of(caminho));
+                } else {
+                    // Se não for Windows, define permissões POSIX
+                    Set<PosixFilePermission> perms = EnumSet.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE);
+                    Files.createFile(Path.of(caminho), PosixFilePermissions.asFileAttribute(perms));
+                }
 
-            String conteudo = "Id Maquina: " + idMaquina +
-                    "\nUtilização RAM: " + uRam +
-                    "\nUtilização CPU: " + uProcessador +
-                    "\nUtilização Disco: " + uDisco +
-                    "\nUtilização Download: " + uDown +
-                    "\nUtilização Upload: " + uUp +
-                    "\nUtilização GPU: " + uGpu +
-                    "\nData e hora: " + dataHoje;
-
-            buffer.write(conteudo);
-            buffer.newLine();
-            buffer.close();
-
-            System.out.println("Verifique seu log armazenado em: " + caminhoArquivo);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    //Para conseguir realizar o select e conseguir alocar os valores em variaves (sem usar map) usei classes DTO
-    public static class RetornoSelect {
-        private Integer quantidadeDeLogs;
-        private String tipoDoComponente;
-        private String nomeDaMaquina;
-        private String unidadeDaLanHouse;
-
-        // getters e setters
-        // ...
-
-        public Integer getQuantidadeDeLogs() {
-            return quantidadeDeLogs;
+                try (BufferedWriter writer = Files.newBufferedWriter(Path.of(caminho))) {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        public String getTipoDoComponente() {
-            return tipoDoComponente;
-        }
+//        try {
+//            File hist = new File(caminhoArquivo);
+//
+//            if (!hist.exists()) {
+//                hist.createNewFile();
+//            }
+//
+//            BufferedWriter buffer = new BufferedWriter(new FileWriter(caminhoArquivo, true));
+//
+//            String conteudo = "Id Maquina: " + idMaquina +
+//                    "\nUtilização RAM: " + uRam +
+//                    "\nUtilização CPU: " + uProcessador +
+//                    "\nUtilização Disco: " + uDisco +
+//                    "\nUtilização Download: " + uDown +
+//                    "\nUtilização Upload: " + uUp +
+//                    "\nUtilização GPU: " + uGpu +
+//                    "\nData e hora: " + dataHoje;
+//
+//            buffer.write(conteudo);
+//            buffer.newLine();
+//
+//
+//            System.out.println("Verifique seu log armazenado em: " + caminhoArquivo);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-        public String getNomeDaMaquina() {
-            return nomeDaMaquina;
-        }
 
-        public String getUnidadeDaLanHouse() {
-            return unidadeDaLanHouse;
-        }
+        //Para conseguir realizar o select e conseguir alocar os valores em variaves (sem usar map) usei classes DTO
 
-
-    }
-
-    public static class RetornoParaLog {
-        private String tipoDoComponente;
-        private String nomeDaMaquina;
-        private String unidadeDaLanHouse;
-        private String dataHora;
-
-        // getters e setters
-        // ...
-
-
-        public String getTipoDoComponente() {
-            return tipoDoComponente;
-        }
-
-        public String getNomeDaMaquina() {
-            return nomeDaMaquina;
-        }
-
-        public String getUnidadeDaLanHouse() {
-            return unidadeDaLanHouse;
-        }
-
-        public String getDataHora() {
-            return dataHora;
-        }
 
     }
 }

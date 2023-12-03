@@ -13,9 +13,7 @@ ScriptInsercao.class
 Classes\Componente.class
 Classes\LanHouse.class
 ConexaoSQL.class
-AcessoJDBC$RetornoSelect.class
 Classes\Empresa.class
 Classes\MetricaComponente.class
 Classes\Usuario.class
 ScriptInsercao$1.class
-AcessoJDBC$RetornoParaLog.class

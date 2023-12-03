@@ -63,12 +63,12 @@ public class Componente extends TipoComponente {
 
     @Override
     public String toString() {
-        return "\nComponente{" +
-                "id Componente=" + idComponente +
-                ", nomeComponente=" + nomeComponente +
-                ", fk Maquina=" + fkMaquina +
-                ", fk TipoComponente=" + fkTipoComponente +
-                ", fk Metrica=" + fkMetrica +
+        return "Componente{" +
+                "idComponente=" + idComponente +
+                ", nomeComponente='" + nomeComponente + '\'' +
+                ", fkMaquina=" + fkMaquina +
+                ", fkTipoComponente=" + fkTipoComponente +
+                ", fkMetrica=" + fkMetrica +
                 '}';
     }
 

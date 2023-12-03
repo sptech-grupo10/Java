@@ -268,12 +268,9 @@ public class AcessoJDBC {
         String caminhoArquivo = System.getProperty("java.io.tmpdir") + "/";
        // String caminhoArquivo = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
 
-
-        //mudar de acordo com a máquina
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
         String dataHoje = LocalDateTime.now().format(dtf);
         String caminho = caminhoArquivo + dataHoje + "_log.txt";
-        System.out.println(caminho);
         String componente = "";
 
         if (Files.exists(Path.of(caminho))) {
@@ -302,11 +299,10 @@ public class AcessoJDBC {
                         "\nUtilização Download: " + uDown +
                         "\nUtilização Upload: " + uUp +
                         "\nUtilização GPU: " + uGpu +
-                        "\nData e hora: " + dataHoje;
+                        "\nData e hora: " + dataHoje +
+                        "\nArquivo salvo em: " + caminho;
 
-                System.out.println(conteudo);
                 buffer.write(conteudo);
-                System.out.println("escreveu?");
                 buffer.newLine();
                 buffer.close();
 

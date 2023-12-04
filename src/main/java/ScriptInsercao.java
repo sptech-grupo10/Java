@@ -210,15 +210,16 @@ public class ScriptInsercao {
                 } else {
                     textLog = "Processador em uso normal";
                     statusLog = 1;
+                   //acesso.enviarAlerta(idMaquina, idLanHouse, 1, statusLog);
 
                 }
                 acesso.insercaoDados(textLog, utilizacaoProcessador, dataHora, statusLog, idProcessador);
 
                 if (enviarAlerta && statusLog.equals(2)){
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 2);
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 2);
                 } else if (enviarAlerta && statusLog.equals(3)) {
-                    acesso.enviarAlerta(idMaquina, idLanHouse, 1, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu, 1);
+                    acesso.enviarAlerta(idMaquina, idLanHouse, 2, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, (Conversor.formatarBytes(velocidadeDownload.longValue())), (Conversor.formatarBytes(velocidadeUpload.longValue())), porcGpu, 1);
                 }
                 enviarAlerta = false;
 
@@ -244,7 +245,7 @@ public class ScriptInsercao {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 2, 2);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 2, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu, 2);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, (Conversor.formatarBytes(velocidadeDownload.longValue())), (Conversor.formatarBytes(velocidadeUpload.longValue())), porcGpu, 2);
                 }
                 enviarAlerta = false;
 
@@ -271,7 +272,7 @@ public class ScriptInsercao {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 3, 2);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 3, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu, 3);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, (Conversor.formatarBytes(velocidadeDownload.longValue())), (Conversor.formatarBytes(velocidadeUpload.longValue())), porcGpu, 3);
                 }
                 enviarAlerta = false;
 
@@ -298,7 +299,7 @@ public class ScriptInsercao {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu, 4);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, (Conversor.formatarBytes(velocidadeDownload.longValue())), (Conversor.formatarBytes(velocidadeUpload.longValue())), porcGpu, 4);
                 }
                 enviarAlerta = false;
 
@@ -324,7 +325,7 @@ public class ScriptInsercao {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 2);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 4, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu, 4);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado,(Conversor.formatarBytes(velocidadeDownload.longValue())), (Conversor.formatarBytes(velocidadeUpload.longValue())), porcGpu, 4);
                 }
                 enviarAlerta = false;
 
@@ -349,7 +350,7 @@ public class ScriptInsercao {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 5, 2);
                 } else if (enviarAlerta && statusLog.equals(3)) {
                     acesso.enviarAlerta(idMaquina, idLanHouse, 5, 3);
-                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, porcentagemVelocidadeDowload, porcentagemVelocidadeUpload, porcGpu, 5);
+                    acesso.construirLog(idMaquina, utilizacaoProcessador, porcMemoria, porcentagemDiscoOcupado, (Conversor.formatarBytes(velocidadeDownload.longValue())), (Conversor.formatarBytes(velocidadeUpload.longValue())), porcGpu, 5);
                 }
               enviarAlerta = false;
 

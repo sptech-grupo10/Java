@@ -125,125 +125,57 @@ public class AcessoJDBC {
 
     public void enviarAlerta(Integer idMaquina, Integer idLanHouse, Integer fkComponente, Integer idMensagem) {
         //System.out.println("entrou no enviar");
-        String sql =
-                "SELECT " +
-                        "COUNT(*) AS quantidadeDeLogs " +
-                        "FROM Log " +
-                        "JOIN Componente ON Log.fkComponente = Componente.idComponente " +
-                        "JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente " +
-                        "JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina " +
-                        "JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse " +
-                        "WHERE LanHouse.idLanHouse = ? " +
-                        "AND Maquina.idMaquina = ? " +
-                        "AND Componente.fkTipoComponente = ? " +
-                        "AND Log.statuslog = ? " +
-                        "AND Log.dataLog >= DATEADD(SECOND, -1980, GETDATE()) " +
-                        "GROUP BY " +
-                        "tipoComponente.tipoComponente, " +
-                        "Maquina.nomeMaquina, " +
-                        "LanHouse.unidade "
-                //"Log.dataLog " +
-                //"ORDER BY " +
-                //"Log.dataLog DESC " +
-                //"LIMIT 1 "
-                ;
+        String sql = "SELECT COUNT(*) AS quantidadeDeLogs " +
+                "FROM Log " +
+                "JOIN Componente ON Log.fkComponente = Componente.idComponente " +
+                "JOIN TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente " +
+                "JOIN Maquina ON Componente.fkMaquina = Maquina.idMaquina " +
+                "JOIN LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse " +
+                "WHERE LanHouse.idLanHouse = ? " +
+                "AND Maquina.idMaquina = ? " +
+                "AND Componente.fkTipoComponente = ? " +
+                "AND Log.statuslog = ? " +
+                "AND Log.dataLog >= DATEADD(MINUTE, -200, GETDATE()) " +
+                "GROUP BY " +
+                "TipoComponente.tipoComponente, " +
+                "Maquina.nomeMaquina, " +
+                "LanHouse.unidade";
+
 
         List<Integer> qtdRegistros = con.queryForList(sql, Integer.class, idLanHouse, idMaquina, fkComponente
                 , idMensagem
         );
+
+        //System.out.println(qtdRegistros);
         if (!qtdRegistros.isEmpty()) {
-        //    System.out.println("viu se é senfjnefe");
+           // System.out.println("viu se é senfjnefe");
+            System.out.println(qtdRegistros.get(0));
             if (qtdRegistros.get(0).equals(10)) {
+            //if (qtdRegistros.get(0) > 10) {
 
 
                 String sqlTipoComponente = """
-                            SELECT
-                                TipoComponente.tipoComponente AS tipoDoComponente
-                            FROM
-                                Log
-                            JOIN
-                                Componente ON Log.fkComponente = Componente.idComponente
-                            JOIN
-                                TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente
-                            JOIN
-                                Maquina ON Componente.fkMaquina = Maquina.idMaquina
-                            JOIN
-                                LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse
-                            WHERE
-                                LanHouse.idLanHouse = ?
-                                AND Maquina.idMaquina = ?
-                                AND Componente.fkTipoComponente = ?
-                                AND Log.statuslog = ?
-                                AND Log.dataLog >= DATEADD(SECOND, -1980, GETDATE())
-                            ORDER BY
-                                Log.dataLog DESC
-                            LIMIT 1;
+                            select tipoComponente from TipoComponente where idTipoComponente = ?;
                         """;
 
 
                 List<String> infoTipoComponente = con.queryForList(sqlTipoComponente, String.class,
-                        idLanHouse, idMaquina, fkComponente
-                        , idMensagem
-                );
+                        fkComponente);
 
 
                 String sqlNomeMaquina = """
-                            SELECT
-                                Maquina.nomeMaquina AS nomeDaMaquina
-                            FROM
-                                Log
-                            JOIN
-                                Componente ON Log.fkComponente = Componente.idComponente
-                            JOIN
-                                TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente
-                            JOIN
-                                Maquina ON Componente.fkMaquina = Maquina.idMaquina
-                            JOIN
-                                LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse
-                            WHERE
-                                LanHouse.idLanHouse = ?
-                                AND Maquina.idMaquina = ?
-                                AND Componente.fkTipoComponente = ?
-                                AND Log.statuslog = ?
-                                AND Log.dataLog >= DATEADD(SECOND, -1980, GETDATE())
-                            ORDER BY
-                                Log.dataLog DESC
-                            LIMIT 1;
+                            SELECT nomeMaquina from Maquina where idMaquina = ?;
                         """;
 
                 List<String> infoNomeMaquina = con.queryForList(sqlNomeMaquina, String.class,
-                        idLanHouse, idMaquina, fkComponente
-                        , idMensagem
-                );
+                        idMaquina);
 
                 String sqlUnidadeLanHouse = """
-                            SELECT
-                                LanHouse.unidade AS unidadeDaLanHouse
-                            FROM
-                                Log
-                            JOIN
-                                Componente ON Log.fkComponente = Componente.idComponente
-                            JOIN
-                                TipoComponente ON Componente.fkTipoComponente = TipoComponente.idTipoComponente
-                            JOIN
-                                Maquina ON Componente.fkMaquina = Maquina.idMaquina
-                            JOIN
-                                LanHouse ON Maquina.fkLanhouse = LanHouse.idLanHouse
-                            WHERE
-                                LanHouse.idLanHouse = ?
-                                AND Maquina.idMaquina = ?
-                                AND Componente.fkTipoComponente = ?
-                                AND Log.statuslog = ?
-                                AND Log.dataLog >= DATEADD(SECOND, -1980, GETDATE())
-                            ORDER BY
-                                Log.dataLog DESC
-                            LIMIT 1;
+                            select unidade from LanHouse where idLanHouse = ?;
                         """;
 
                 List<String> infoUnidade = con.queryForList(sqlUnidadeLanHouse, String.class,
-                        idLanHouse, idMaquina, fkComponente
-                        , idMensagem
-                );
+                        idLanHouse);
 
                 try {
                     String mensagem = String.format("""
@@ -263,20 +195,24 @@ public class AcessoJDBC {
     }
 
 
-    public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, Double uDown, Double uUp, Double uGpu, Integer idComponente) {
+    public void construirLog(Integer idMaquina, Double uProcessador, Double uRam, Double uDisco, String uDown, String uUp, Double uGpu, Integer idComponente) {
 
         String caminhoArquivo = System.getProperty("java.io.tmpdir") + "/";
        // String caminhoArquivo = "C:\\Users\\SAMSUNG\\Desktop\\SP Tech\\2º sem\\Repositórios\\Java";
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
         String dataHoje = LocalDateTime.now().format(dtf);
+
+        Date dataHoraAtual = new Date();
+        String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
+        String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
+
         String caminho = caminhoArquivo + dataHoje + "_log.txt";
         String componente = "";
 
         if (Files.exists(Path.of(caminho))) {
             try {
                 BufferedWriter buffer = new BufferedWriter(new FileWriter(caminho, true));
-                System.out.println("foi?");
                 if (idComponente.equals(1)){
                     componente = "CPU";
                 } else if (idComponente.equals(2)) {
@@ -291,16 +227,18 @@ public class AcessoJDBC {
 
                 List<String> nomeMaquina = con.queryForList("SELECT nomeMaquina FROM maquina WHERE idMaquina = ?", String.class, idMaquina);
 
-                String conteudo = "A Máquina " + nomeMaquina.get(0) + " precisa de atenção em " + componente + "." +
+                String conteudo = "\nA Máquina " + nomeMaquina.get(0) + " precisa de atenção em " + componente + "." +
                         "\nId Maquina: " + idMaquina +
-                        "\nUtilização RAM: " + uRam +
-                        "\nUtilização CPU: " + uProcessador +
-                        "\nUtilização Disco: " + uDisco +
+                        "\nUtilização RAM: " + uRam + "%" +
+                        "\nUtilização CPU: " + uProcessador + "%"+
+                        "\nUtilização Disco: " + uDisco + "%"+
                         "\nUtilização Download: " + uDown +
                         "\nUtilização Upload: " + uUp +
-                        "\nUtilização GPU: " + uGpu +
-                        "\nData e hora: " + dataHoje +
-                        "\nArquivo salvo em: " + caminho;
+                        "\nUtilização GPU: " + uGpu + "%" +
+                        "\nData: " + data + " Hora: " + hora +
+                        "\nArquivo salvo em: " + caminho +
+                        "\n"
+                        ;
 
                 buffer.write(conteudo);
                 buffer.newLine();
@@ -310,19 +248,20 @@ public class AcessoJDBC {
                 e.printStackTrace();
             }
         } else {
-            boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+            //vendo o SO
+            boolean win = System.getProperty("os.name").toLowerCase().contains("win");
 
             try {
-                if (isWindows) {
-                    // Se for Windows, cria o arquivo sem definir permissões
+                if (win) {
                     Files.createFile(Path.of(caminho));
                 } else {
-                    // Se não for Windows, define permissões POSIX
-                    Set<PosixFilePermission> perms = EnumSet.of(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE);
+                    Set<PosixFilePermission> perms = EnumSet.of(PosixFilePermission.OWNER_READ,
+                            PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_WRITE);
                     Files.createFile(Path.of(caminho), PosixFilePermissions.asFileAttribute(perms));
                 }
 
-                try (BufferedWriter writer = Files.newBufferedWriter(Path.of(caminho))) {
+                try {
+                    BufferedWriter writer = Files.newBufferedWriter(Path.of(caminho));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -330,39 +269,5 @@ public class AcessoJDBC {
                 e.printStackTrace();
             }
         }
-
-//        try {
-//            File hist = new File(caminhoArquivo);
-//
-//            if (!hist.exists()) {
-//                hist.createNewFile();
-//            }
-//
-//            BufferedWriter buffer = new BufferedWriter(new FileWriter(caminhoArquivo, true));
-//
-//            String conteudo = "Id Maquina: " + idMaquina +
-//                    "\nUtilização RAM: " + uRam +
-//                    "\nUtilização CPU: " + uProcessador +
-//                    "\nUtilização Disco: " + uDisco +
-//                    "\nUtilização Download: " + uDown +
-//                    "\nUtilização Upload: " + uUp +
-//                    "\nUtilização GPU: " + uGpu +
-//                    "\nData e hora: " + dataHoje;
-//
-//            buffer.write(conteudo);
-//            buffer.newLine();
-//
-//
-//            System.out.println("Verifique seu log armazenado em: " + caminhoArquivo);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-
-        //Para conseguir realizar o select e conseguir alocar os valores em variaves (sem usar map) usei classes DTO
-
-
     }
 }

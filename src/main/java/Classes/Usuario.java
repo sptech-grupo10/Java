@@ -6,7 +6,7 @@ public class Usuario extends TipoUsuario {
     private String sobrenome;
     private String situacao;
     private String email;
-    private  String senha;
+    private String senha;
     private Integer fkLanHouse;
     private Integer fkEmpresa;
     private Integer fkTipoUsuario;
@@ -31,7 +31,6 @@ public class Usuario extends TipoUsuario {
         this.idUsuario = idUsuario;
     }
 
-
     public String getNome() {
         return nome;
     }
@@ -39,7 +38,6 @@ public class Usuario extends TipoUsuario {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
 
     public String getSobrenome() {
         return sobrenome;
@@ -49,7 +47,6 @@ public class Usuario extends TipoUsuario {
         this.sobrenome = sobrenome;
     }
 
-
     public String getSituacao() {
         return situacao;
     }
@@ -58,21 +55,21 @@ public class Usuario extends TipoUsuario {
         this.situacao = situacao;
     }
 
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }    public String getSenha() {
+    }
+
+    public String getSenha() {
         return senha;
     }
 
     public void setSenha(String senha) {
         this.senha = senha;
     }
-
 
     public Integer getFkLanHouse() {
         return fkLanHouse;
@@ -82,7 +79,6 @@ public class Usuario extends TipoUsuario {
         this.fkLanHouse = fkLanHouse;
     }
 
-
     public Integer getFkEmpresa() {
         return fkEmpresa;
     }
@@ -90,7 +86,6 @@ public class Usuario extends TipoUsuario {
     public void setFkEmpresa(Integer fkEmpresa) {
         this.fkEmpresa = fkEmpresa;
     }
-
 
     public Integer getFkTipoUsuario() {
         return fkTipoUsuario;
@@ -100,22 +95,31 @@ public class Usuario extends TipoUsuario {
         this.fkTipoUsuario = fkTipoUsuario;
     }
 
+    public boolean senhaSegura() {
+        return senha.length() >= 8 && senha.matches(".*\\d.*") && senha.matches(".*[!@#$%^&*()].*");
+    }
+
+    public void alterarSenha(String novaSenha) {
+        if (senhaSegura(novaSenha)) {
+            this.senha = novaSenha;
+            System.out.println("Senha alterada com sucesso!");
+        } else {
+            System.out.println("A nova senha não atende aos critérios de segurança.");
+        }
+    }
 
     @Override
     public String toString() {
         return "\nUsuario{" +
-                "id usuario=" + idUsuario +
+                "idUsuario=" + idUsuario +
                 ", nome=" + nome +
                 ", sobrenome=" + sobrenome +
-                ", situação=" + situacao +
+                ", situacao=" + situacao +
                 ", email=" + email +
-                ", senha="+"Salva"+
-                ", fk LanHouse=" + fkLanHouse +
-                ", fk empresa =" + fkEmpresa +
-                ", fk tipo de usuario=" + fkTipoUsuario +
+                ", senha=" + "Salva" +
+                ", fkLanHouse=" + fkLanHouse +
+                ", fkEmpresa=" + fkEmpresa +
+                ", fkTipoUsuario=" + fkTipoUsuario +
                 '}';
     }
-
-
-
 }

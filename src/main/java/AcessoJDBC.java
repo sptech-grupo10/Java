@@ -57,7 +57,11 @@ public class AcessoJDBC {
         idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, maquina.getNomeMaquina(), maquina.getFkLanHouse());
 
         if (idMaquinas.isEmpty()) {
+            //nuvem
             con.update("INSERT INTO Maquina(nomeMaquina, fkLanhouse) VALUES (?, ?)", maquina.getNomeMaquina(), maquina.getFkLanHouse());
+            System.out.println("Máquina " + maquina.getNomeMaquina() + " cadastrada");
+            //local
+            conexaoMysqlConexaoDoBanco.update("INSERT INTO Maquina(nomeMaquina, fkLanhouse) VALUES (?, ?)", maquina.getNomeMaquina(), maquina.getFkLanHouse());
             System.out.println("Máquina " + maquina.getNomeMaquina() + " cadastrada");
             idMaquinas = con.queryForList("SELECT idMaquina FROM Maquina WHERE nomeMaquina = ? AND fkLanhouse = ?", Integer.class, maquina.getNomeMaquina(), maquina.getFkLanHouse());
         }
@@ -71,7 +75,10 @@ public class AcessoJDBC {
         especComponenteSel = con.queryForList("SELECT idEspecificacaoComponente FROM EspecificacaoComponente WHERE especificacao = ? AND valorEspecificacao = ? AND fkComponente = ?", Integer.class, especificacaoComponente.getEspecificacao(), especificacaoComponente.getValor(), especificacaoComponente.getFkComponente());
 
         if (especComponenteSel.isEmpty()) {
+            //nuvem
             con.update("INSERT INTO EspecificacaoComponente(especificacao, valorEspecificacao, fkComponente) VALUES (?, ?, ?)", especificacaoComponente.getEspecificacao(), especificacaoComponente.getValor(), especificacaoComponente.getFkComponente());
+            //local
+            conexaoMysqlConexaoDoBanco.update("INSERT INTO EspecificacaoComponente(especificacao, valorEspecificacao, fkComponente) VALUES (?, ?, ?)", especificacaoComponente.getEspecificacao(), especificacaoComponente.getValor(), especificacaoComponente.getFkComponente());
         }
     }
 
@@ -85,7 +92,10 @@ public class AcessoJDBC {
         metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, metricaComponente.getMin(), metricaComponente.getMax(), metricaComponente.getUnidadeMedida());
 
         if (metricaComponenteSel.isEmpty()) {
+            //nuvem
             con.update("INSERT INTO MetricaComponente(minMetrica, maxMetrica, unidadeMedida) VALUES (?, ?, ?)", metricaComponente.getMin(), metricaComponente.getMax(), metricaComponente.getUnidadeMedida());
+            //local
+            conexaoMysqlConexaoDoBanco.update("INSERT INTO MetricaComponente(minMetrica, maxMetrica, unidadeMedida) VALUES (?, ?, ?)", metricaComponente.getMin(), metricaComponente.getMax(), metricaComponente.getUnidadeMedida());
             metricaComponenteSel = con.queryForList("SELECT idMetricaComponente FROM MetricaComponente WHERE minMetrica = ? AND maxMetrica = ? AND unidadeMedida = ?", Integer.class, metricaComponente.getMin(), metricaComponente.getMax(), metricaComponente.getUnidadeMedida());
         }
 
@@ -98,7 +108,10 @@ public class AcessoJDBC {
         componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica);
 
         if (componenteSel.isEmpty()) {
+            //nuvem
             con.update("INSERT INTO Componente(fkMaquina, valorTotal, fkTipoComponente, fkMetricaComponente) VALUES(?, ?, ?, ?)", idMaquina, valorTotal, idTipoComponente, idMetrica);
+            //local
+            conexaoMysqlConexaoDoBanco.update("INSERT INTO Componente(fkMaquina, valorTotal, fkTipoComponente, fkMetricaComponente) VALUES(?, ?, ?, ?)", idMaquina, valorTotal, idTipoComponente, idMetrica);
             componenteSel = con.queryForList("SELECT idComponente FROM Componente WHERE fkMaquina = ? AND fkTipoComponente = ? AND fkMetricaComponente = ?", Integer.class, idMaquina, idTipoComponente, idMetrica);
         }
 
@@ -117,9 +130,15 @@ public class AcessoJDBC {
 
     public void insercaoDados(String textLog, Double valor, Object timer, Integer statusLog, Integer idComponente) {
         if (textLog.contains("Download") || textLog.contains("Upload")) {
+            //nuvem
             con.update("INSERT INTO Log(textLog, valor, dataLog, statusLog, fkComponente) VALUES (?, ?, ?, ?, ?)", textLog, valor.longValue(), timer, statusLog, idComponente);
+            //local
+            conexaoMysqlConexaoDoBanco.update("INSERT INTO Log(textLog, valor, dataLog, statusLog, fkComponente) VALUES (?, ?, ?, ?, ?)", textLog, valor.longValue(), timer, statusLog, idComponente);
         } else {
+            //nuvem
             con.update("INSERT INTO Log(textLog, valor, dataLog, statusLog, fkComponente) VALUES (?, ?, ?, ?, ?)", textLog, valor.shortValue(), timer, statusLog, idComponente);
+            //local
+            conexaoMysqlConexaoDoBanco.update("INSERT INTO Log(textLog, valor, dataLog, statusLog, fkComponente) VALUES (?, ?, ?, ?, ?)", textLog, valor.shortValue(), timer, statusLog, idComponente);
         }
     }
 

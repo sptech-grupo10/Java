@@ -5,23 +5,19 @@ import Classes.TipoComponente;
 import com.github.seratch.jslack.Slack;
 import com.github.seratch.jslack.api.webhook.Payload;
 import com.github.seratch.jslack.api.webhook.WebhookResponse;
-import com.google.common.io.InsecureRecursiveDeleteException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class AcessoJDBC {
     ConexaoSQL conexao = new ConexaoSQL();
@@ -289,4 +285,36 @@ public class AcessoJDBC {
             }
         }
     }
+
+    public List<Map<String, Object>> buscarUltimosDados(Integer idMaquina, Integer componente) {
+        List<Map<String, Object>> retornoSelect = new ArrayList<>();
+
+        String sql = "SELECT l.dataLog, l.textLog, tc.tipoComponente " +
+                "FROM Log AS l " +
+                "INNER JOIN Componente AS c ON l.fkComponente = c.idComponente " +
+                "INNER JOIN Maquina AS m ON c.fkMaquina = m.idMaquina " +
+                "INNER JOIN TipoComponente AS tc ON c.fkTipoComponente = tc.idTipoComponente " +
+                "WHERE m.idMaquina = ? AND c.fkTipoComponente = ? " +
+                "ORDER BY l.dataLog DESC LIMIT 5";
+
+        List<Map<String, Object>> result = con.queryForList(sql, idMaquina, componente);
+
+        for (Map<String, Object> row : result) {
+            retornoSelect.add(row);
+        }
+
+        return retornoSelect;
+    }
+
+    public void imprimirUltimosDados(Integer idMaquina, Integer componente) {
+        List<Map<String, Object>> dados = buscarUltimosDados(idMaquina, componente);
+
+        for (Map<String, Object> linha : dados) {
+            System.out.println("Tipo: " + linha.get("tipoComponente"));
+            System.out.println("Data: " + linha.get("dataLog"));
+            System.out.println("Condição: " + linha.get("textLog"));
+            System.out.println(); // Adiciona uma linha em branco entre os elementos
+        }
+    }
+
 }
